@@ -183,20 +183,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="hw3-creating-a-webapp" class="level1">
 <h1>HW3: Creating a Webapp</h1>
-<section id="in-this-blog-post-i-will-go-over-how-to-develop-and-create-your-own-webapp" class="level6">
-<h6 class="anchored" data-anchor-id="in-this-blog-post-i-will-go-over-how-to-develop-and-create-your-own-webapp">In this blog post I will go over how to develop and create your own webapp</h6>
+<section id="in-this-blog-post-i-will-go-over-how-to-develop-and-create-your-own-webapp-using-python-and-flask" class="level6">
+<h6 class="anchored" data-anchor-id="in-this-blog-post-i-will-go-over-how-to-develop-and-create-your-own-webapp-using-python-and-flask">In this blog post I will go over how to develop and create your own webapp using Python and Flask!</h6>
 </section>
 <section id="to-start-i-created-a-github-repository-where-i-placed-all-my-files-so-i-could-easily-commit-and-push-any-changes-i-have-made" class="level6">
 <h6 class="anchored" data-anchor-id="to-start-i-created-a-github-repository-where-i-placed-all-my-files-so-i-could-easily-commit-and-push-any-changes-i-have-made">To start I created a github repository where I placed all my files, so I could easily commit and push any changes I have made</h6>
 </section>
 <section id="step-1-creating-the-html-files" class="level3">
-<h3 class="anchored">Step 1: Creating the HTML files</h3>
-<section id="to-first-start-i-created-three-html-files-base.html-submit.html-and-view.html.-each-one-of-them-fullfill-a-diffrent-porpose-that-i-will-explain-below." class="level5">
-<h5 class="anchored" data-anchor-id="to-first-start-i-created-three-html-files-base.html-submit.html-and-view.html.-each-one-of-them-fullfill-a-diffrent-porpose-that-i-will-explain-below.">To first start I created three HTML files, base.html, submit.html, and view.html. each one of them fullfill a diffrent porpose that I will explain below.</h5>
+<h3 class="anchored" data-anchor-id="step-1-creating-the-html-files">Step 1: Creating the HTML files</h3>
+<p>To first start I created three HTML files, base.html, submit.html, and view.html. each one of them fullfill a diffrent porpose that I will explain below. The app.py file is the application script file where is the main file that will handle the flask functions and any other function that we will use in the creation of the webapp.</p>
 </section>
-<section id="base.html" class="level4">
-<h4 class="anchored">Base.html</h4>
-<p>This HTML code sets up the main page that opens up when you open the URL. Within the first page, you are displayed with the two links, to either see the message or to submit a message, as well as a list of random messages that have been submitted previously.</p>
+<section id="base.html" class="level3">
+<h3 class="anchored">Base.html</h3>
+<p>This HTML code sets up the main page that opens up when you open the URL. Within the first page, you are displayed with the two links, to either see the message or to submit a message, as well as a list of random messages that have been submitted previously. The other HTML sites will essentially inherent from the base page.</p>
 &lt;!doctype html&gt; <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 <title>
 {% block title %}{% endblock %} - PIC16B Website
@@ -249,8 +248,8 @@ Random Messages:
 </section>
 
 </section>
-<section id="submit.html" class="level4">
-<h4 class="anchored" data-anchor-id="submit.html">Submit.html</h4>
+<section id="submit.html" class="level3">
+<h3 class="anchored" data-anchor-id="submit.html">Submit.html</h3>
 <p>This html takes care of the page in which indvdiuals submit their message. They are asked to provide their name and submit a message. Once submitting, they can then also chose to see any previous message or be directed to main page.</p>
 <p>{% extends ‘base.html’ %}</p>
 {% block header %}
@@ -281,9 +280,9 @@ Random Messages:
 </form>
 <p>{% endblock %}</p>
 </section>
-<section id="view.html" class="level4">
-<h4 class="anchored">View.html</h4>
-<p>This last html presents the messages that have been submmited and orders them inside a table so it is easier to view past messages.</p>
+<section id="view.html" class="level3">
+<h3 class="anchored">View.html</h3>
+<p>This last html presents the messages that have been submmited and orders them inside a table so it is easier to view past messages. At the bottom of the post I also included the code for the style.css file. For now, the pourpose of that file is to modify the webapp by changing the color of the page, the font, the location of the text, and any other stylistic changes you wish to make.</p>
 &lt;!doctype html&gt;
 
 
@@ -330,110 +329,188 @@ Message
 
 
 </section>
-</section>
+<section id="important-note" class="level2">
+<h2 class="anchored" data-anchor-id="important-note">Important Note:</h2>
+<p>When working on this project you want to make sure your folder with all the files is organized in a certain way. Inside your project directory you want to have three main folders called: app.py, templates, and static. Inside the app.py you will have your functions, inside the templates you will add your base.html,submit.html, and view.html files. And lastly, inside the static folder you will have your style.css.</p>
 <section id="step-2-creat-functions-for-data-base-mangment" class="level3">
 <h3 class="anchored" data-anchor-id="step-2-creat-functions-for-data-base-mangment">Step 2: Creat functions for data base mangment</h3>
+<p>Now that we have everything organized and set up we are ready to start writing the functions !</p>
 <section id="first-we-need-to-import-all-the-packages-we-might-be-using" class="level5">
 <h5 class="anchored" data-anchor-id="first-we-need-to-import-all-the-packages-we-might-be-using">First we need to import all the packages we might be using</h5>
-<p>from flask import Flask, g, render_template, request import sqlite3</p>
-<p>import sklearn as sk import matplotlib.pyplot as plt import numpy as np import pickle import os from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas from matplotlib.figure import Figure</p>
-<p>import io import base64</p>
-<p>First we start by creating a datavase and naming it as well as intializing flask applications. The base function retrives 3 random messages and renders the base.html templetes, which also passes the messages to be displayed on the main page. The submit function tkaes the POST commend to add the message into the database. The submit.html templet is then rendered to prompt users to submit a message. Lastly, the message function retrives all the messages that were added to the database amd renders the view.html template which displays the messages to the users.</p>
-<p>““” This script contains routes and functions for a Flask web application.</p>
-<p>It defines routes for the main page, message submission, and viewing messages. ““”</p>
-<p>DATABASE = ‘messages_db.sqlite’ app = Flask(<strong>name</strong>)</p>
-<p>““” Renders the main page of the web application.</p>
-<pre><code>Retrieves 3 random messages and renders the 'base.html' template with these messages.
-"""</code></pre>
-<p><span class="citation" data-cites="app.route">@app.route</span>(‘/’) def base(): messages = random_messages(3) # Retrieve 3 random messages return render_template(‘base.html’, messages=messages)</p>
-<p>““” Handles message submission.</p>
-<pre><code>If the request method is POST, it inserts the message into the database.
-Renders the 'submit.html' template.</code></pre>
-<p>““” <span class="citation" data-cites="app.route">@app.route</span>(‘/submit’, methods=[‘GET’,‘POST’]) def submit(): if request.method == ‘POST’: insert_message(request) return render_template(‘submit.html’)</p>
-<p>““” Displays all messages stored in the database.</p>
-<pre><code>Retrieves all messages from the database and renders the 'view.html' template with these messages.</code></pre>
-<p>““” <span class="citation" data-cites="app.route">@app.route</span>(‘/message’) def message(): db = get_message_db() cursor = db.cursor() cursor.execute(“SELECT * FROM messages”) messages = cursor.fetchall() cursor.close() return render_template(‘view.html’, messages=messages)</p>
-<p>This function then retrives trhe SQLite database connection used for storing the messages that were submitted by the users.</p>
+<div class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> flask <span class="im">import</span> Flask, g, render_template, request</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sqlite3</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sklearn <span class="im">as</span> sk</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pickle</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.backends.backend_agg <span class="im">import</span> FigureCanvasAgg <span class="im">as</span> FigureCanvas</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.figure <span class="im">import</span> Figure</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> io</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> base64</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="route-functions" class="level3">
+<h3 class="anchored" data-anchor-id="route-functions">Route Functions</h3>
+<p>For this project we will need to use route functions. A route function is a URL patter that Flask is able to read and respond to. To ensure that a specific function is called and run when the URL is opned we use “<span class="citation" data-cites="app.route">@app.route</span>” to indicate which function we want to use.</p>
+<p>To create the flask web server instance run the following code:</p>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>app <span class="op">=</span> Flask(<span class="va">__name__</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Below are all the route functions we will need to use, after that I will go into the main functions that theses route functions are refering back to.</p>
+<p>First we start by creating a database and naming it.The base function retrives 3 random messages and renders the base.html templetes, which also passes the messages to be displayed on the main page. The submit function takes the POST commend to add the message into the database. The submit.html templet is then rendered to prompt users to submit a message. Lastly, the message function retrives all the messages that were added to the database amd renders the view.html template which displays the messages to the users.</p>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">"""</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">This script contains routes and functions for a Flask web application.</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">It defines routes for the main page, message submission, and viewing messages.</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">"""</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>DATABASE <span class="op">=</span> <span class="st">'messages_db.sqlite'</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a> <span class="co">"""</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co">    Renders the main page of the web application.</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">    Retrieves 3 random messages and renders the 'base.html' template with these messages.</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">'/'</span>)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> base():</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    messages <span class="op">=</span> random_messages(<span class="dv">3</span>)  <span class="co"># Retrieve 3 random messages</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> render_template(<span class="st">'base.html'</span>, messages<span class="op">=</span>messages)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  <span class="co">"""</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co">    Handles message submission.</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="co">    If the request method is POST, it inserts the message into the database.</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="co">    Renders the 'submit.html' template.</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="co">   """</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">'/submit'</span>, methods<span class="op">=</span>[<span class="st">'GET'</span>,<span class="st">'POST'</span>])</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> submit():</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> request.method <span class="op">==</span> <span class="st">'POST'</span>:</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>        insert_message(request)</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> render_template(<span class="st">'submit.html'</span>)</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="co">"""</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="co">    Displays all messages stored in the database.</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="co">    Retrieves all messages from the database and renders the 'view.html' template with these messages.</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="co">"""</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">'/message'</span>)</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> message():</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>    db <span class="op">=</span> get_message_db()</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>    cursor <span class="op">=</span> db.cursor()</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>    cursor.execute(<span class="st">"SELECT * FROM messages"</span>)</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    messages <span class="op">=</span> cursor.fetchall()</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    cursor.close()</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> render_template(<span class="st">'view.html'</span>, messages<span class="op">=</span>messages)</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-error">
+<pre><code>IndentationError: unindent does not match any outer indentation level (&lt;tokenize&gt;, line 17)</code></pre>
+</div>
+</div>
+</section>
+<section id="get_message_db-function" class="level3">
+<h3 class="anchored" data-anchor-id="get_message_db-function">Get_message_db function</h3>
+<p>The pourpose of this function is to handle the messages that are being submitted by creating a database. The function first checks the SQL database ( which is called message_db) to see if the database exists. If it does not, it creates a new one and stores it in g.message_db. Once that is done it followes the SQL command to create the message table with the added message, and end the connection once done.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Function to get the message database</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">"""</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Retrieve the SQLite database connection for storing messages.</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">    If the 'message_db' attribute is not present in the global 'g' object, </span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">    it creates a new connection to the SQLite database defined by the </span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">    'DATABASE' constant. It also creates a 'messages' table in the database </span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">    if it doesn't already exist.</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co">    - sqlite3.Connection: The SQLite database connection object.</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_message_db():</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="st">'message_db'</span> <span class="kw">not</span> <span class="kw">in</span> g:</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>        g.message_db <span class="op">=</span> sqlite3.<span class="ex">connect</span>(DATABASE)</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>        cursor <span class="op">=</span> g.message_db.cursor()</span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>        cursor.execute(<span class="st">'''CREATE TABLE IF NOT EXISTS messages (</span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="st">                            id INTEGER PRIMARY KEY,</span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="st">                            handle TEXT,</span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="st">                            message TEXT</span></span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="st">                        )'''</span>)</span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>        g.message_db.commit()</span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> g.message_db</span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Function to get the message database</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">"""</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Retrieve the SQLite database connection for storing messages.</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">    If the 'message_db' attribute is not present in the global 'g' object, </span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">    it creates a new connection to the SQLite database defined by the </span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">    'DATABASE' constant. It also creates a 'messages' table in the database </span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">    if it doesn't already exist.</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co">    - sqlite3.Connection: The SQLite database connection object.</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_message_db():</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="st">'message_db'</span> <span class="kw">not</span> <span class="kw">in</span> g:</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>        g.message_db <span class="op">=</span> sqlite3.<span class="ex">connect</span>(DATABASE)</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>        cursor <span class="op">=</span> g.message_db.cursor()</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>        cursor.execute(<span class="st">'''CREATE TABLE IF NOT EXISTS messages (</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="st">                            id INTEGER PRIMARY KEY,</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="st">                            handle TEXT,</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="st">                            message TEXT</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="st">                        )'''</span>)</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>        g.message_db.commit()</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> g.message_db</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We then need to create a function that inserts the message into the database.It retracts the name of the user and their message from the form data using the request.form[‘nm’] and request.form[‘message’].Then, it executes an SQL query to insert the name and message into the ‘messages’ table in the database.</p>
 </section>
-</section>
-</section>
-<section id="function-to-insert-a-user-message-into-the-database" class="level1">
-<h1>Function to insert a user message into the database</h1>
-<p>def insert_message(request): ““” Insert a user message into the database.</p>
-<pre><code>Args:
-- request (flask.request): The request object containing form data.
-
-Returns:
-- str: The message that was inserted into the database.
-"""
-db = get_message_db()
-cursor = db.cursor()
-name = request.form['nm']
-message = request.form['message']
-cursor.execute("INSERT INTO messages (handle, message) VALUES (?, ?)", (name, message))
-db.commit()
-cursor.close()
-return message</code></pre>
-<p>Lastly, the last two functions display the page that presents the list of random messages and randomizes the message that are being presented.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">'/view_messages'</span>)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> view_messages():</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>     <span class="co">"""</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">    Display a page showing a random selection of messages.</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">    - flask.render_template: HTML page displaying the random messages.</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    messages <span class="op">=</span> random_messages(<span class="dv">5</span>)  <span class="co"># You can change the number of messages to retrieve</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> render_template(<span class="st">'view.html'</span>, messages<span class="op">=</span>messages)</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Function to retrieve n random messages from the database</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> random_messages(n):</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="co">    Retrieve n random messages from the database.</span></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="co">    Args:</span></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co">    - n (int): Number of random messages to retrieve.</span></span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="co">    - list: A list of tuples containing the retrieved messages.</span></span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    db <span class="op">=</span> get_message_db()</span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    cursor <span class="op">=</span> db.cursor()</span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    cursor.execute(<span class="st">"SELECT * FROM messages ORDER BY RANDOM() LIMIT ?"</span>, (n,))</span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    messages <span class="op">=</span> cursor.fetchall()</span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    cursor.close()</span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    db.close()  <span class="co"># Close the database connection</span></span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> messages</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="function-to-insert-a-user-message-into-the-database" class="level3">
+<h3 class="anchored" data-anchor-id="function-to-insert-a-user-message-into-the-database">Function to insert a user message into the database</h3>
+<p>This function than deals with storing the messages submitted by the users. it calles the get_message_db to connect back to the database, connect to the cursor and then followes the SQL command to add the message with the id ( the name inputted by the user) to the message table. Once that is done it commits the function and closes the database connection again</p>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> insert_message(request):</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>     <span class="co">"""</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Insert a user message into the database.</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">    Args:</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">    - request (flask.request): The request object containing form data.</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co">    - str: The message that was inserted into the database.</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    db <span class="op">=</span> get_message_db()</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    cursor <span class="op">=</span> db.cursor()</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    name <span class="op">=</span> request.form[<span class="st">'nm'</span>]</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    message <span class="op">=</span> request.form[<span class="st">'message'</span>]</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    cursor.execute(<span class="st">"INSERT INTO messages (handle, message) VALUES (?, ?)"</span>, (name, message))</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    db.commit()</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    cursor.close()</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> message</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a> </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-error">
+<pre><code>IndentationError: unindent does not match any outer indentation level (&lt;tokenize&gt;, line 11)</code></pre>
 </div>
+</div>
+</section>
+<section id="random-messages-and-view_message-functions" class="level3">
+<h3 class="anchored" data-anchor-id="random-messages-and-view_message-functions">Random messages and View_message functions</h3>
+<p>Lastly, the last two functions display the page that presents the list of random messages and randomizes the message that are being presented.The functions are used to rabndomize five diffrent messages from the database. This will be seen in our main page. The function works by connecting to the cursor, executing SQL command by selecting rnaodm messages before closing the database connection again.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">'/view_messages'</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> view_messages():</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>     <span class="co">"""</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">    Display a page showing a random selection of messages.</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">    - flask.render_template: HTML page displaying the random messages.</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    messages <span class="op">=</span> random_messages(<span class="dv">5</span>)  <span class="co"># You can change the number of messages to retrieve</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> render_template(<span class="st">'view.html'</span>, messages<span class="op">=</span>messages)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Function to retrieve n random messages from the database</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> random_messages(n):</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co">    Retrieve n random messages from the database.</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co">    Args:</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co">    - n (int): Number of random messages to retrieve.</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="co">    - list: A list of tuples containing the retrieved messages.</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    db <span class="op">=</span> get_message_db()</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>    cursor <span class="op">=</span> db.cursor()</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>    cursor.execute(<span class="st">"SELECT * FROM messages ORDER BY RANDOM() LIMIT ?"</span>, (n,))</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>    messages <span class="op">=</span> cursor.fetchall()</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>    cursor.close()</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>    db.close()  <span class="co"># Close the database connection</span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> messages</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="now-is-the-fun-part" class="level2">
+<h2 class="anchored" data-anchor-id="now-is-the-fun-part">Now is the fun part</h2>
 <section id="once-we-have-wrote-all-the-code-and-saved-all-the-files-we-then-run-the-following-code-in-the-terminal-to-publish-the-webapp-and-get-the-url-for-it" class="level4">
 <h4 class="anchored" data-anchor-id="once-we-have-wrote-all-the-code-and-saved-all-the-files-we-then-run-the-following-code-in-the-terminal-to-publish-the-webapp-and-get-the-url-for-it">Once we have wrote all the code and saved all the files we then run the following code in the terminal to publish the webapp and get the url for it</h4>
 <p>set FLASK_ENV=app.py</p>
@@ -441,32 +518,79 @@ return message</code></pre>
 </section>
 <section id="here-is-what-my-webapp-looks-like" class="level4">
 <h4 class="anchored" data-anchor-id="here-is-what-my-webapp-looks-like">Here is what my webapp looks like</h4>
-<section id="first-is-the-main-page-the-user-sees-when-opening-the-url" class="level5">
-<h5 class="anchored" data-anchor-id="first-is-the-main-page-the-user-sees-when-opening-the-url">First is the main page the user sees when opening the URL</h5>
+<section id="first-is-the-main-page-the-user-sees-when-opening-the-url-.-by-looking-the-style.css-code-at-the-bottom-you-can-see-how-i-chnaged-the-font-and-color-of-the-page-and-words." class="level5">
+<h5 class="anchored" data-anchor-id="first-is-the-main-page-the-user-sees-when-opening-the-url-.-by-looking-the-style.css-code-at-the-bottom-you-can-see-how-i-chnaged-the-font-and-color-of-the-page-and-words.">First is the main page the user sees when opening the URL . By looking the styl;e.css code at the bottom you can see how I chnaged the font and color of the page and words.</h5>
+<p>As you can see there are two links: submit message and view message in the main page. This is were our rout functions come into play. We are essentially calling submit.html and view.html routes in order to be able to be directed to another page</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="Index_files/figure-html/9156e73a-6b9f-4649-a60e-8629e5f1ff40-1-a67c1a0f-e015-461a-bece-5a6cf6432347.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">color main.png</figcaption>
+<p><img src="Index_files/figure-html/9156e73a-6b9f-4649-a60e-8629e5f1ff40-1-11bf5be4-f483-4a32-b858-52571e0b355f.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">better front page.png</figcaption>
 </figure>
 </div>
-<p>Once opening the submit a message url you are prompted to this page</p>
+</section>
+</section>
+<section id="message-page" class="level3">
+<h3 class="anchored" data-anchor-id="message-page">Message page</h3>
+<p>Once opening the submit a message url you are prompted to this page. Like I talked about before, this is where we need to utalize the Get and Post methods in order to be able to repsond to HTTP request and send the datat of the submitted messages.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="Index_files/figure-html/b57dc8e2-5c17-4d7a-91c9-063b997ae7b6-1-8d19d889-eaf9-4d70-9da7-18ed6f1c549b.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">color messahe.png</figcaption>
+<p><img src="Index_files/figure-html/b57dc8e2-5c17-4d7a-91c9-063b997ae7b6-1-18f4d58e-7979-460d-8476-b4f657d20d9a.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">better submit page.png</figcaption>
 </figure>
 </div>
-<p>lastly, here is the list of message you can view once opining the view messages link</p>
+</section>
+<section id="viewing-the-message" class="level3">
+<h3 class="anchored" data-anchor-id="viewing-the-message">Viewing the message</h3>
+<p>The last part is to send the users to a page where they can view their messages. This is where the message route message function and view.html come into play. Since we are not transmitting any data we will only be using the GET method in this route function. Below I added the route message again so we can further examine it</p>
+<p>The function goes into the database with the messages and uses .fetchall() to select all the messages submitted by the user.Once it is done it makes sure to close the sursor again and return our view.html templet. By doing so we are able to see the page depicted below , with some of the message I wrote.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">'/message'</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> message():</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    db <span class="op">=</span> get_message_db()</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    cursor <span class="op">=</span> db.cursor()</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    cursor.execute(<span class="st">"SELECT * FROM messages"</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    messages <span class="op">=</span> cursor.fetchall()</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    cursor.close()</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> render_template(<span class="st">'view.html'</span>, messages<span class="op">=</span>messages)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="Index_files/figure-html/8ebee9ff-d01d-4736-987e-7d2bedbd8330-1-6e7d0f33-dcc7-4742-824b-38fd14706bd6.png" class="img-fluid figure-img"></p>
 <figcaption class="figure-caption">color message listy.png</figcaption>
 </figure>
 </div>
-
-
+</section>
+<section id="for-the-style-of-the-page-below-is-my-style.css-code" class="level3">
+<h3 class="anchored" data-anchor-id="for-the-style-of-the-page-below-is-my-style.css-code">For the style of the page below is my style.css code</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>html {</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    font<span class="op">-</span>family: Times New Roman<span class="op">;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    background: aliceblue<span class="op">;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    padding: <span class="dv">1</span><span class="er">rem</span><span class="op">;</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>body {</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    background:aliceblue<span class="op">;</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    font<span class="op">-</span>family: Times New Roman<span class="op">;</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">max</span><span class="op">-</span>width: <span class="dv">900</span><span class="er">px</span><span class="op">;</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    margin: <span class="dv">0</span> auto<span class="op">;</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>h1 {</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    color: rgb(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>)<span class="op">;</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    font<span class="op">-</span>family: Times New Roman<span class="op">;</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    margin: <span class="dv">1</span><span class="er">rem</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    text<span class="op">-</span>align: center<span class="op">;</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 </section>
+</section>
+<section id="summary" class="level1">
+<h1>Summary</h1>
+<p>In this post we learned how to creat HTML templates and use flask to creat a webapp.We got to use bpth the POST and GET methods. Additionally, we got top work with route functions and understnd how to nevigate between the diffrent functions to create a working webapp to works as a message bank.</p>
+
+
 </section>
 
 </main> <!-- /main -->
