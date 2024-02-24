@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Neomi Goodman">
+<meta name="dcterms.date" content="2024-02-23">
 
-<title>Myblog - HW 4: Heat Diffusion</title>
+<title>Myblog - HW 4, Heat Diffusion</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -140,14 +142,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">HW 4: Heat Diffusion</h1>
-                      </div>
+      <h1 class="title">HW 4, Heat Diffusion</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">week 7</div>
+                <div class="quarto-category">HW 4</div>
+              </div>
+                  </div>
   </div>
     
   
   <div class="quarto-title-meta">
 
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Neomi Goodman </p>
+            </div>
+    </div>
       
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">February 23, 2024</p>
+      </div>
+    </div>
     
       
     </div>
@@ -163,67 +181,116 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="in-this-blog-we-will-create-a-simulation-of-two-dimensional-heat-diffusion.-to-start-off-we-will-create-a" class="level4">
-<h4 class="anchored" data-anchor-id="in-this-blog-we-will-create-a-simulation-of-two-dimensional-heat-diffusion.-to-start-off-we-will-create-a">In this blog we will create a simulation of two-dimensional heat diffusion. To start off we will create a</h4>
-<div class="cell" data-execution_count="1">
+<section id="hw-4-heat-diffusion" class="level1">
+<h1>HW 4: Heat Diffusion</h1>
+<section id="in-this-blog-we-will-create-a-simulation-of-two-dimensional-heat-diffusion.-below-i-will-present-four-diffrent-methods-that-can-be-uses-to-compute-matrixs-and-create-the-heat-difussions.-this-involves-more-math-than-past-blogs-but-it-will-still-be-fun-so-lets-get-into-it" class="level4">
+<h4 class="anchored" data-anchor-id="in-this-blog-we-will-create-a-simulation-of-two-dimensional-heat-diffusion.-below-i-will-present-four-diffrent-methods-that-can-be-uses-to-compute-matrixs-and-create-the-heat-difussions.-this-involves-more-math-than-past-blogs-but-it-will-still-be-fun-so-lets-get-into-it">In this blog we will create a simulation of two-dimensional heat diffusion. Below I will present four diffrent methods that can be uses to compute matrixs and create the heat difussions. This involves more math than past blogs but it will still be fun so lets get into it!</h4>
+</section>
+<section id="set-up" class="level2">
+<h2 class="anchored" data-anchor-id="set-up">Set Up</h2>
+<p>Below we set up and intalizes our N and epsilon variables as well as set up the main conditions for the heat difussion starting with the point in the middle</p>
+<ul>
+<li><p>N represents the size of the gride as well as the number of points that we will have on the dimension that the simulation is run on. Since we are working on a 2D gride the N gride will be N x N. The larger the vlaue of N is , the finer the gride will be. For this blog we will set up the N value to be 101</p></li>
+<li><p>Epsilon is the parameter that represents the stability constant or time step size in the simulation. Since we are working with heat difussion it can also be used to represent a scaling factor for the diffusion rate (this impacts the spead). Here we set the epsilon to be 0.2</p></li>
+</ul>
+<div class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="dv">101</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>epsilon <span class="op">=</span> <span class="fl">0.2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib <span class="im">import</span> pyplot <span class="im">as</span> plt</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># construct initial condition: 1 unit of heat at midpoint. </span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>u0 <span class="op">=</span> np.zeros((N, N))</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>u0[<span class="bu">int</span>(N<span class="op">/</span><span class="dv">2</span>), <span class="bu">int</span>(N<span class="op">/</span><span class="dv">2</span>)] <span class="op">=</span> <span class="fl">1.0</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>plt.imshow(u0)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="2">
-<pre><code>&lt;matplotlib.image.AxesImage at 0x224deba3940&gt;</code></pre>
+<p>Below we imported some of the main packages we will need to use to both measure the time each method took and to present the heat difussion. we also constructed a gride with the initial condition to use as a starting point.</p>
+<div class="cell" data-outputid="90468c15-559e-4135-d1d1-9db2eca3b8b8" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time <span class="co">#so I could caluclate the time each method took</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib <span class="im">import</span> pyplot <span class="im">as</span> plt</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># construct initial condition: 1 unit of heat at midpoint.</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>u0 <span class="op">=</span> np.zeros((N, N))</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>u0[<span class="bu">int</span>(N<span class="op">/</span><span class="dv">2</span>), <span class="bu">int</span>(N<span class="op">/</span><span class="dv">2</span>)] <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>plt.imshow(u0)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>&lt;matplotlib.image.AxesImage at 0x7ec2cd0da6e0&gt;</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <p><img src="index_files/figure-html/cell-3-output-2.png" class="img-fluid"></p>
 </div>
 </div>
+<section id="now-that-we-have-the-basic-things-estblished-we-are-ready-to-dive-into-the-first-method-creating-heat-difussion-with-matrix-multiplication." class="level3">
+<h3 class="anchored" data-anchor-id="now-that-we-have-the-basic-things-estblished-we-are-ready-to-dive-into-the-first-method-creating-heat-difussion-with-matrix-multiplication.">Now that we have the basic things estblished we are ready to dive into the first method, creating heat difussion with matrix multiplication.</h3>
 </section>
-<section id="part-1" class="level2">
-<h2 class="anchored" data-anchor-id="part-1">Part 1:</h2>
-<div class="cell" data-execution_count="23">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> py </span>
+</section>
+</section>
+<section id="part-1-with-matrix-multiplication" class="level1">
+<h1>Part 1: With matrix multiplication</h1>
+<p>To start off we will need to constract a matrix A that represents the discrete Laplacian operator in a two-dimensional grid for solving partial differential equations (PDEs) like the heat equation, and a function advance_time_matvecmul that advances the simulation of heat diffusion (or a similar process) by one timestep.</p>
+<p>Lets’ dive into each part:</p>
+<section id="construction-of-matrix-a-function-get_a" class="level4">
+<h4 class="anchored" data-anchor-id="construction-of-matrix-a-function-get_a">Construction of matrix ‘A’: function get_A</h4>
+<p>The code below works by calculating the total number of points in a gride size of NxN. The diagonals section initializes arrays to represent the diagonals of the matrix A.</p>
+<ul>
+<li><p>The main diagonal (-4 * np.ones(n)) corresponds to the finite difference approximation of the Laplace operator in 2D</p></li>
+<li><p>The next two arrays (np.ones(n-1)) represent the immediate left and right neighbors in the grid (horizontal connections).</p></li>
+<li><p>The last two arrays (np.ones(n-N)) represent the top and bottom neighbors (vertical connections).</p></li>
+</ul>
+<p>The last line combines these diagonals into the matrix A, using np.diag to place each array into the specified diagonal of a matrix. This creats a sparse matrix representation of the Laplace operator. This part is the is central to simulating diffusion-like processes and will come in handy in future methods.</p>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> py</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> N <span class="op">*</span> N</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>diagonals <span class="op">=</span> [<span class="op">-</span><span class="dv">4</span> <span class="op">*</span> np.ones(n), np.ones(n<span class="op">-</span><span class="dv">1</span>), np.ones(n<span class="op">-</span><span class="dv">1</span>), np.ones(n<span class="op">-</span>N), np.ones(n<span class="op">-</span>N)]</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>diagonals[<span class="dv">1</span>][(N<span class="op">-</span><span class="dv">1</span>)::N] <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>diagonals[<span class="dv">2</span>][(N<span class="op">-</span><span class="dv">1</span>)::N] <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> np.diag(diagonals[<span class="dv">0</span>]) <span class="op">+</span> np.diag(diagonals[<span class="dv">1</span>], <span class="dv">1</span>) <span class="op">+</span> np.diag(diagonals[<span class="dv">2</span>], <span class="op">-</span><span class="dv">1</span>) <span class="op">+</span> np.diag(diagonals[<span class="dv">3</span>], N) <span class="op">+</span> np.diag(diagonals[<span class="dv">4</span>], <span class="op">-</span>N)</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_A(N):</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> N <span class="op">*</span> N</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    diagonals <span class="op">=</span> [<span class="op">-</span><span class="dv">4</span> <span class="op">*</span> np.ones(n), np.ones(n<span class="op">-</span><span class="dv">1</span>), np.ones(n<span class="op">-</span><span class="dv">1</span>), np.ones(n<span class="op">-</span>N), np.ones(n<span class="op">-</span>N)]</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    diagonals[<span class="dv">1</span>][(N<span class="op">-</span><span class="dv">1</span>)::N] <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    diagonals[<span class="dv">2</span>][(N<span class="op">-</span><span class="dv">1</span>)::N] <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    A <span class="op">=</span> np.diag(diagonals[<span class="dv">0</span>]) <span class="op">+</span> np.diag(diagonals[<span class="dv">1</span>], <span class="dv">1</span>) <span class="op">+</span> np.diag(diagonals[<span class="dv">2</span>], <span class="op">-</span><span class="dv">1</span>) <span class="op">+</span> np.diag(diagonals[<span class="dv">3</span>], N) <span class="op">+</span> np.diag(diagonals[<span class="dv">4</span>], <span class="op">-</span>N)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> A</span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co"># this function advances the simulation by one timestep using matrix-vector multiplication </span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> advance_time_matvecmul(A, u, epsilon):</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Advances the simulation by one timestep, via matrix-vector multiplication</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co">    Args:</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co">        A: The 2d finite difference matrix, N^2 x N^2. </span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="co">        u: N x N grid state at timestep k.</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="co">        epsilon: stability constant.</span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="co">        N x N Grid state at timestep k+1.</span></span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    N <span class="op">=</span> u.shape[<span class="dv">0</span>]</span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    u <span class="op">=</span> u <span class="op">+</span> epsilon <span class="op">*</span> (A <span class="op">@</span> u.flatten()).reshape((N, N))</span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> u</span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-execution_count="24">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_A(N):</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> N <span class="op">*</span> N</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    diagonals <span class="op">=</span> [<span class="op">-</span><span class="dv">4</span> <span class="op">*</span> np.ones(n), np.ones(n<span class="op">-</span><span class="dv">1</span>), np.ones(n<span class="op">-</span><span class="dv">1</span>), np.ones(n<span class="op">-</span>N), np.ones(n<span class="op">-</span>N)]</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    diagonals[<span class="dv">1</span>][(N<span class="op">-</span><span class="dv">1</span>)::N] <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    diagonals[<span class="dv">2</span>][(N<span class="op">-</span><span class="dv">1</span>)::N] <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    A <span class="op">=</span> np.diag(diagonals[<span class="dv">0</span>]) <span class="op">+</span> np.diag(diagonals[<span class="dv">1</span>], <span class="dv">1</span>) <span class="op">+</span> np.diag(diagonals[<span class="dv">2</span>], <span class="op">-</span><span class="dv">1</span>) <span class="op">+</span> np.diag(diagonals[<span class="dv">3</span>], N) <span class="op">+</span> np.diag(diagonals[<span class="dv">4</span>], <span class="op">-</span>N)</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> A</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="advance-_time_matvecmul-function" class="level4">
+<h4 class="anchored" data-anchor-id="advance-_time_matvecmul-function">Advance _time_matvecmul function</h4>
+<p>This function creats a one timestep of a process like heat diffusion across a two-dimensional grid. It uses matrix-vector multiplication to apply the discrete Laplace operator to the grid state.</p>
+<p>The function works by inputing the matrix A we previously created, u which is our grid- a 2D array where each element represents the temperature at each point, and lastly our epsilon. We first start by flatting our gride into a vector so it would match our dimensionsexpected by A for matrix-vector multiplication.</p>
+<p>Once we have done that the A @ u.flatten() applies the discrete Laplace operator to the grid state, simulating the diffusion effect. Once it is done the gride getsr eshaped back into a 2D array (N x N) and added to the original state u, resulting in the new grid state.</p>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># this function advances the simulation by one timestep using matrix-vector multiplication</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> jax</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> jax.numpy <span class="im">as</span> jnp</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> jax <span class="im">import</span> jit</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> jax.experimental.sparse <span class="im">import</span> BCOO</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="at">@jax.jit</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> advance_time_matvecmul(A, u, epsilon):</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Advances the simulation by one timestep, via matrix-vector multiplication</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co">    Args:</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co">        A: The 2d finite difference matrix, N^2 x N^2.</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co">        u: N x N grid state at timestep k.</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co">        epsilon: stability constant.</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="co">        N x N Grid state at timestep k+1.</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    N <span class="op">=</span> u.shape[<span class="dv">0</span>]</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    u <span class="op">=</span> u <span class="op">+</span> epsilon <span class="op">*</span> (A <span class="op">@</span> u.flatten()).reshape((N, N))</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> u</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-execution_count="27">
+</section>
+<section id="visualization" class="level2">
+<h2 class="anchored" data-anchor-id="visualization">Visualization</h2>
+<p>Now that we created out two functions we are finally ready to start visualizing our heat difussion maps.</p>
+<section id="set-up-before-visualization" class="level4">
+<h4 class="anchored" data-anchor-id="set-up-before-visualization">Set up before visualization</h4>
+<p>Before we can start using pyplot we need to creat snapshots of the gride state every 300 iteration to make it easier to graph.</p>
+</section>
+<section id="we-start-by-intializing-the-gride-state-and-parameters" class="level4">
+<h4 class="anchored" data-anchor-id="we-start-by-intializing-the-gride-state-and-parameters">We start by intializing the Gride state and Parameters</h4>
+<p>we use u0 for the gride state to use the intial state we created at the begining of the blog post. We also make sure to use the epsilon and N parameters that we established at the begining</p>
+</section>
+<section id="then-we-construct-the-laplace-operator-matrix-a" class="level4">
+<h4 class="anchored" data-anchor-id="then-we-construct-the-laplace-operator-matrix-a">Then we construct the Laplace Operator Matrix A</h4>
+<p>here we call our get_A function to get our A matrix #### lastly, we run the simulation We created a loop following i to iterate 2700 times. Each time we iterate it represents a timestep in the simulation. It is importnat that we make sure to also update the gride state to represents the new iteration. We can update the gride by applying the matrix A to the current state u through the function advance_time_matvecmul. For the last part of this section, it is important that we store the intermediate solutions. Since 2700 is a lot of iterations we only want to keep track of every 300 iterations starting at 300 which we indicated in our if loop. We then append the iteration to our list ” solutions1 and we are now finally ready to start making cool heat difussions !!!</p>
+<div class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize your grid state 'u' and stability constant 'epsilon'</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>u <span class="op">=</span> u0  <span class="co">#  initial grid state</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>epsilon <span class="op">=</span> <span class="fl">0.2</span>  <span class="co"># stability constant</span></span>
@@ -235,50 +302,414 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize a list to store the intermediate solutions</span></span>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>solutions1 <span class="op">=</span> []</span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Run the simulation for 2700 iterations</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2701</span>):</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    u <span class="op">=</span> advance_time_matvecmul(A, u, epsilon)</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Store the solution every 300 iterations</span></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> i <span class="op">%</span> <span class="dv">300</span> <span class="op">==</span><span class="dv">0</span> <span class="kw">and</span> i <span class="op">!=</span><span class="dv">0</span>:</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>        solutions1.append(u.copy())</span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Now, 'solutions' contains the grid state every 300 iterations</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>s_time1<span class="op">=</span>time.time()</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Run the simulation for 2700 iterations</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2701</span>):</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    u <span class="op">=</span> advance_time_matvecmul(A, u, epsilon)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Store the solution every 300 iterations</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> i <span class="op">%</span> <span class="dv">300</span> <span class="op">==</span><span class="dv">0</span> <span class="kw">and</span> i <span class="op">!=</span><span class="dv">0</span>:</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>        solutions1.append(u.copy())</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="co">#to calculate the total time it took to create it</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>ed_time1<span class="op">=</span>time.time()</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>total_time1<span class="op">=</span>ed_time1<span class="op">-</span> s_time1</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Now, 'solutions' contains the grid state every 300 iterations</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-execution_count="30">
+</section>
+<section id="graphing" class="level3">
+<h3 class="anchored" data-anchor-id="graphing">Graphing</h3>
+<p>We will use matplot to create our visualizations. First, we create a 3x# grid of the subplots to show each of heat difussions that we captured at the diffrent iterations.</p>
+<p>We start by looping throut our list with the iterations.</p>
+<p>The row = i // 3 and col = i % 3 section calculate the row and column positions for the subplot that corresponds to the current solution. This arrangement distributes the plots across the 3x3 grid based on their index. // is the floor division operator, ensuring an integer result, and % gives the remainder, effectively wrapping the column index after every third plot.</p>
+<p>lastly, we use pyplot to graph everything :)</p>
+<div class="cell" data-outputid="b94f25fa-9bc6-497b-e3fd-e675f454d322" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a 3x3 grid of subplots</span></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(<span class="dv">3</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">10</span>))</span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Loop over the solutions and plot each one</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, solution <span class="kw">in</span> <span class="bu">enumerate</span>(solutions1):</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Calculate the row and column indices for the subplot</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    row <span class="op">=</span> i <span class="op">//</span> <span class="dv">3</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    col <span class="op">=</span> i <span class="op">%</span> <span class="dv">3</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Plot the solution on the subplot</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    axs[row, col].imshow(solution, cmap<span class="op">=</span><span class="st">'viridis'</span>, interpolation<span class="op">=</span><span class="st">'nearest'</span>)</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    axs[row, col].set_title(<span class="ss">f"Iteration </span><span class="sc">{</span>(i<span class="op">+</span><span class="dv">1</span>)<span class="op">*</span><span class="dv">300</span><span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the plot</span></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Loop over the solutions and plot each one</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, solution <span class="kw">in</span> <span class="bu">enumerate</span>(solutions1):</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Calculate the row and column indices for the subplot</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    row <span class="op">=</span> i <span class="op">//</span> <span class="dv">3</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    col <span class="op">=</span> i <span class="op">%</span> <span class="dv">3</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Plot the solution on the subplot</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    axs[row, col].imshow(solution, cmap<span class="op">=</span><span class="st">'viridis'</span>, interpolation<span class="op">=</span><span class="st">'nearest'</span>)</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    axs[row, col].set_title(<span class="ss">f"Iteration </span><span class="sc">{</span>(i<span class="op">+</span><span class="dv">1</span>)<span class="op">*</span><span class="dv">300</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the plot</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <p><img src="index_files/figure-html/cell-7-output-1.png" class="img-fluid"></p>
 </div>
 </div>
-<section id="part-2" class="level3">
-<h3 class="anchored" data-anchor-id="part-2">Part 2</h3>
-<p>faster but has far more restrictions, in a senses it has to be a ” pure ” function without no side effects such as even a print statement</p>
+<section id="wow-look-how-pretty-they-all-look-to-be-able-to-compare-the-diffrent-methods-we-also-made-sure-to-capture-how-long-it-took-to-creat-the-heat-diffusions-as-can-be-seen-right-below" class="level5">
+<h5 class="anchored" data-anchor-id="wow-look-how-pretty-they-all-look-to-be-able-to-compare-the-diffrent-methods-we-also-made-sure-to-capture-how-long-it-took-to-creat-the-heat-diffusions-as-can-be-seen-right-below">Wow look how pretty they all look!! To be able to compare the diffrent methods we also made sure to capture how long it took to creat the heat diffusions as can be seen right below</h5>
+<div class="cell" data-outputid="9dc993b0-de19-4bcf-8743-d167ecf8ef60" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="ss">f"Total time it took:</span><span class="sc">{</span>total_time1<span class="sc">:0.2f}</span><span class="ss">sec"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Total time it took:217.09sec</code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+</section>
+<section id="part-2-sparse-matrix-in-jax" class="level1">
+<h1>Part 2: Sparse matrix in JAX</h1>
+<p>Now it is time we try another method. This time we will use a sparse matrix in Jax. This method is supposed to be faster. While you might things, if it is faster why do we even need the other method, using JAX does have limitations. Jax has far more restrictions. Unlike the previous method, the function has to be “pure”, that is we can no agumant or chnage the shape of the matrix like we were able to do before.</p>
+<p>We first have to start by importing all the packages we will need for this method</p>
+<div class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> jax</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> jax.numpy <span class="im">as</span> jnp</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> jax <span class="im">import</span> jit</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> jax.experimental.sparse <span class="im">import</span> BCOO</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="get_sparse_a-function" class="level4">
+<h4 class="anchored" data-anchor-id="get_sparse_a-function">Get_sparse_A function</h4>
+<p>For this method we need to create a sparse function as it is an efficent way to represent and manipulate matrices that are mostly filled with zeros.</p>
+<p>In this function we need to constructs a sparse matrix that approximates the Laplace operator on a 2D grid. The matrix accounts for nearest-neighbor interactions in a grid of size N x N and the resulting sparse matrix is returned in the BCOO format, which optimized for operations within the JAX framework.</p>
+<p>It is important to note that the function uses JAX’s numpy for array operations and JAX’s experimental sparse module for the sparse matrix representation. The reason we do this is to make sure there is a compatibility with JAX’s autodiff and JIT compilation capabilities.</p>
+<p>Let’s now dive into the actual code of the function. The function works by first calculating the totla number of grid points. We then define the main diagonal of the Laplacian matrix to be intialized with -4 to reflect the 2D discrete Laplace operator. Following that the two sets of off-diagnolas represents the hroizontal and vertrical “neighbors” for each the gride points. To make sure there is no wrap around effect between the right edgde and the left edge of the gride we create a mask to apply to the off_diag_1 which delas with the horizontal points.</p>
+<p>Lastly, sparse create the sparse matrix A_sparse in BCOO format by first creating a dense representation of the Laplacian and then converting it to a sparse format. In order to do this, we need to add the diagonal matrices formed by main_diag, off_diag_1, and off_diag_N with appropriate offsets to place them correctly relative to the main diagonal. The offsets for off_diag_1 are 1 and -1 (for horizontal neighbors), and N and -N for off_diag_N (for vertical neighbors), ensuring the Laplacian correctly represents the grid’s topology.</p>
+<div class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_sparse_A(N):</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Generates a sparse matrix representation of the 2D discrete Laplace operator using JAX.</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">  </span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters:</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co">    - N (int): The dimension of the grid along one axis, resulting in an N x N grid.</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co">    - A_sparse (BCOO): A sparse matrix in BCOO format representing the Laplace operator on the grid.</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co">      The matrix dimensions are (N^2, N^2), corresponding to the flattened grid.</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> N <span class="op">*</span> N</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Define the main diagonal</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    diagonals<span class="op">=</span>[<span class="op">-</span><span class="dv">4</span> <span class="op">*</span>jnp.ones(n),jnp.ones(n<span class="op">-</span><span class="dv">1</span>),jnp.ones(n<span class="op">-</span><span class="dv">1</span>),jnp.ones(n<span class="op">-</span>N), jnp.ones(n<span class="op">-</span>N)] </span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    <span class="co">#creates the rows and columns</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>    diagonals[<span class="dv">1</span>]<span class="op">=</span>diagonals[<span class="dv">1</span>].at[(N<span class="op">-</span><span class="dv">1</span>)::N].<span class="bu">set</span>(<span class="dv">0</span>)</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>    diagonals[<span class="dv">2</span>]<span class="op">=</span>diagonals[<span class="dv">2</span>].at[(N<span class="op">-</span><span class="dv">1</span>)::N].<span class="bu">set</span>(<span class="dv">0</span>)</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>    <span class="co">#matrix A</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>    A<span class="op">=</span>jnp.diag(diagonals[<span class="dv">0</span>])<span class="op">+</span>jnp.diag(diagonals[<span class="dv">1</span>],<span class="dv">1</span>) <span class="op">+</span>jnp.diag(diagonals[<span class="dv">2</span>],<span class="op">-</span><span class="dv">1</span>)<span class="op">+</span>jnp.diag(diagonals[<span class="dv">3</span>],N)<span class="op">+</span>jnp.diag(diagonals[<span class="dv">4</span>],<span class="op">-</span>N)</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>    <span class="co">#A_sparse=sparse.BC00.fromdense(A)</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>    A_sparse<span class="op">=</span>BCOO.fromdense(A)</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> A_sparse</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="advance_time_matvecmul_sparse-function" class="level3">
+<h3 class="anchored" data-anchor-id="advance_time_matvecmul_sparse-function">Advance_time_matvecmul_sparse function</h3>
+<p>Now that we are done with the first function which works on constructing the matrix we are ready to create a function to advance the simulation of a process (like heat diffusion) by one timestep using a sparse matrix representation of the Laplacian operator. This is very similar to our function in part one.</p>
+<p>The <span class="citation" data-cites="jit">@jit</span> decorator from JAX is used to Just-In-Time compile the function for high performance. JIT compilation is used to translates the function into an optimized form that executes more efficiently on the hardware, particularly beneficial for functions called repeatedly, such as in a simulation loop. This should make the process faster and more efficent.</p>
+<p>Again we are flattining the A_sparse matrix to stimulate the diffussion process and the reshaping it back to the gride form like we did in the past method.</p>
+<div class="cell" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="at">@jit</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> advance_time_matvecmul_sparse(A_sparse, u, epsilon):</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">    Advances the simulation by one timestep using sparse matrix-vector multiplication.</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters:</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co">    - A_sparse (BCOO): The sparse matrix representation of the Laplacian operator, using</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co">      JAX's BCOO format. It encodes the interactions between grid points.</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co">    - u (jax.numpy.ndarray): The current state of the grid as a 2D array, where each element</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="co">      represents the quantity of interest (e.g., temperature) at that grid point.</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="co">    - epsilon (float): A stability constant or timestep size that scales the impact of the</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="co">      Laplacian operator on the grid state.</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="co">    - jax.numpy.ndarray: The updated state of the grid after applying the Laplacian operator,</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="co">      representing the system's state at the next timestep.</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>    N <span class="op">=</span> u.shape[<span class="dv">0</span>]</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>    u_flat <span class="op">=</span> u.flatten()</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>    u_next_flat <span class="op">=</span> u_flat <span class="op">+</span> epsilon <span class="op">*</span> A_sparse <span class="op">@</span> u_flat</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>    u_next <span class="op">=</span> u_next_flat.reshape((N, N))</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> u_next</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="visualization-1" class="level4">
+<h4 class="anchored" data-anchor-id="visualization-1">Visualization</h4>
+<p>Similarly to how we visualized the matrix in method one we are going to follow the same pattern and adjust to the right sparse functions. We create the intermediate_states list to collect the snaphsot at every 300 iterations.</p>
 <div class="cell" data-execution_count="31">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> jax</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> jax.numpy <span class="im">as</span> jnp</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> jax.experimental.sparse <span class="im">import</span> BCOO</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>ModuleNotFoundError: No module named 'jax'</code></pre>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> jax <span class="im">import</span> random</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Assuming get_sparse_A(N) and advance_time_matvecmul_sparse are already defined</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize simulation parameters</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="dv">101</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>epsilon <span class="op">=</span> <span class="fl">0.2</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>iterations <span class="op">=</span> <span class="dv">2700</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>visualization_steps <span class="op">=</span> [i <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">300</span>, <span class="dv">2701</span>, <span class="dv">300</span>)]  <span class="co"># Iterations at which to collect states</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Initial grid state</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>u_initial <span class="op">=</span> jnp.zeros((N, N))</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>u_initial <span class="op">=</span> u_initial.at[N<span class="op">//</span><span class="dv">2</span>, N<span class="op">//</span><span class="dv">2</span>].<span class="bu">set</span>(<span class="fl">1.0</span>)  <span class="co"># Central hot spot</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate sparse matrix A</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>A_sparse <span class="op">=</span> get_sparse_A(N)</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="co"># List to store states for visualization</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>intermediate_states <span class="op">=</span> []</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="co"># start time</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>s_time<span class="op">=</span>time.time()</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Run simulation</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> step <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, iterations <span class="op">+</span> <span class="dv">1</span>):</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>    u_initial <span class="op">=</span> advance_time_matvecmul_sparse(A_sparse, u_initial, epsilon)</span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> step <span class="kw">in</span> visualization_steps:</span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>        intermediate_states.append(u_initial)</span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a><span class="co">#to calculate the total time it took to create it</span></span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>ed_time<span class="op">=</span>time.time()</span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>total_time<span class="op">=</span>ed_time<span class="op">-</span> s_time</span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>When visualizing the heatmaps we created a loop to go through the axes to iterates over all subplot axes in a figure, where axes is a 2D array-like object containing subplot axes.We then also set up an if loop to conditionally plote the intermideat states and ensure that the values stay within the bounds. To change things up and make the heatmaps look even more cool we changes the color by chnaging cmap to ‘hot’. You can look up the all the possible colors if you wish to make your heat maps a diffrent color, the sky is the limit!</p>
+<p>Note: you can make a function that will visualize all the methods without having to repeat some aspect of the code, but I chose to indvdiually show the code each time so it is easier to understand the way the methods works and is vsiualized.</p>
+<div class="cell" data-outputid="f37a28e3-2772-4162-aaa9-16ca653e6c87" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">3</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">15</span>))  <span class="co"># Set up a 3x3 grid of plots</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Ensure axes is a 2D array</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>axes <span class="op">=</span> axes.reshape(<span class="dv">3</span>, <span class="dv">3</span>)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, ax <span class="kw">in</span> <span class="bu">enumerate</span>(axes.flat):</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> i <span class="op">&lt;</span> <span class="bu">len</span>(intermediate_states):  <span class="co"># Check to avoid indexing errors</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>        heatmap <span class="op">=</span> ax.imshow(intermediate_states[i], cmap<span class="op">=</span><span class="st">'hot'</span>, interpolation<span class="op">=</span><span class="st">'nearest'</span>)</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>        ax.set_title(<span class="ss">f'Iteration </span><span class="sc">{</span>visualization_steps[i]<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    ax.axis(<span class="st">'off'</span>)</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Adjust color bar to fit the layout</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>fig.subplots_adjust(right<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>cbar_ax <span class="op">=</span> fig.add_axes([<span class="fl">0.85</span>, <span class="fl">0.15</span>, <span class="fl">0.05</span>, <span class="fl">0.7</span>])</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>fig.colorbar(heatmap, cax<span class="op">=</span>cbar_ax)</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-13-output-1.png" class="img-fluid"></p>
 </div>
 </div>
+<div class="cell" data-outputid="589a2ade-9d45-4259-f176-60ef8f82d0e0" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="ss">f"Total time it took:</span><span class="sc">{</span>total_time<span class="sc">:0.2f}</span><span class="ss">sec"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Total time it took:1.37sec</code></pre>
+</div>
+</div>
+<p>Wow, look at those stunning heat diffusion heatmaps! Also look at the time it took to make them, it is almost 215 seconds faster than the first method, we just saved a lot of time! But surly there got to be an even faster way to do this! Let’s move on to method 3 where we will use direct operation with numpy</p>
+</section>
+</section>
+</section>
+<section id="section-3-direct-operation-with-numpy" class="level1">
+<h1>Section 3 : Direct operation with numpy</h1>
+<p>In this section we will write a new function called advance_time_numpy that will advance the solutiomn of the heat equation by one timestep. This time we will use np.roll() which is a NumPy’s vectorized operations. This function should be faster and will simplfy the process by directly manipulating the grid without explicity using the matrix vector multiplication.</p>
+<section id="step-1-define-function-advance_time_numpy" class="level4">
+<h4 class="anchored" data-anchor-id="step-1-define-function-advance_time_numpy">Step 1: Define function “advance_time_numpy’</h4>
+<p>Similar to the other methods we have to work on the grid the matrix.The function bellow takes the current state of the grid u and the stability constant epsilon as inputs. It then apply periodic boundary conditions implicitly through the use of np.roll, and returns the updated grid state.</p>
+<p>it works by first shifting the elements in padded_u up by one position, donw by 1 position, and left and right by position. This is very similar to what we did in the second method where we used off_diag to move the elements horizontally and vertically. Once we are done shifting the lements the function calculates the differences between the current cell and its neighbors to than multiplies the difference by the stability constant epsilon, and adds the result to the current cell value to get the new cell value. This allowes us to simulate the difussion of heat in the grid.</p>
+<div class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> advance_time_numpy(u, epsilon):</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Simulates heat diffusion by computing the difference between</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co">    a grid cell and its neighbors, and then updating the grid state based on</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co">    this difference. The difference is computed using np.roll, and the grid</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co">    state is updated in-place.</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co">    Args:</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="co">        u (numpy.ndarray): A 2D numpy array representing the grid state at</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="co">                           timestep k.</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="co">        epsilon (float): The stability constant.</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="co">        numpy.ndarray: A 2D numpy array representing the grid state at</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a><span class="co">                       timestep k+1.</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Pad the input array with zeroes on all sides</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>    padded_u <span class="op">=</span> np.pad(u, <span class="dv">1</span>, mode<span class="op">=</span><span class="st">'constant'</span>, constant_values<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Compute the difference using np.roll for simulating heat diffusion</span></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>    up <span class="op">=</span> np.roll(padded_u, <span class="op">-</span><span class="dv">1</span>, axis<span class="op">=</span><span class="dv">0</span>)[<span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>    down <span class="op">=</span> np.roll(padded_u, <span class="dv">1</span>, axis<span class="op">=</span><span class="dv">0</span>)[<span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>    left <span class="op">=</span> np.roll(padded_u, <span class="op">-</span><span class="dv">1</span>, axis<span class="op">=</span><span class="dv">1</span>)[<span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>    right <span class="op">=</span> np.roll(padded_u, <span class="dv">1</span>, axis<span class="op">=</span><span class="dv">1</span>)[<span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Update the grid state based on the difference</span></span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>    u_next <span class="op">=</span> u <span class="op">+</span> epsilon <span class="op">*</span> (up <span class="op">+</span> down <span class="op">+</span> left <span class="op">+</span> right <span class="op">-</span> <span class="dv">4</span> <span class="op">*</span> u)</span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> u_next</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="step-2-visualization-of-the-heat-diffusion" class="level4">
+<h4 class="anchored" data-anchor-id="step-2-visualization-of-the-heat-diffusion">Step 2: Visualization of the Heat Diffusion</h4>
+<p>Once we created the function and we see we are not getting any errors we will follow the similar steps as in the previous sections, and presents the Heat Diffusions. As you can see once we created the function the steps are very similar, showing how much impact the computation aspect is able to have on the heatmpas. We follow the same steps and measure the computation time.</p>
+<p>The simulation starts with a hot spot in the center of the grid, and over time, the heat diffuses throughout the grid. The resulting intermediate_states2 list can be used to visualize this diffusion process. The elapsed_time gives the total computation time of the simulation.</p>
+<div class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulation parameters</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="dv">101</span>  <span class="co"># Grid size</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>epsilon <span class="op">=</span> <span class="fl">0.2</span>  <span class="co"># Stability constant</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>iterations <span class="op">=</span> <span class="dv">2700</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>visualization_steps <span class="op">=</span> [i <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">300</span>, <span class="dv">2701</span>, <span class="dv">300</span>)]</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Initial grid state</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>u_initial <span class="op">=</span> np.zeros((N, N))</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>u_initial[N<span class="op">//</span><span class="dv">2</span>, N<span class="op">//</span><span class="dv">2</span>] <span class="op">=</span> <span class="fl">1.0</span>  <span class="co"># Central hot spot</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="co"># List to store intermediate states for visualization</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>intermediate_states2 <span class="op">=</span> []</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>start_time <span class="op">=</span> time.time()</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Run simulation</span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> step <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, iterations <span class="op">+</span> <span class="dv">1</span>):</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>    u_initial <span class="op">=</span> advance_time_numpy(u_initial, epsilon)</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> step <span class="kw">in</span> visualization_steps:</span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>        intermediate_states2.append(u_initial.copy())</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>elapsed_time <span class="op">=</span> time.time() <span class="op">-</span> start_time</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Again we are graphing the heat maps by graphing the captured interations. To change things up again I chose to change up the color.</p>
+<div class="cell" data-outputid="37ab8bec-2c89-4d70-a7d0-3cf640d8147d" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">3</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">15</span>))</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>axes <span class="op">=</span> axes.flatten()</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, ax <span class="kw">in</span> <span class="bu">enumerate</span>(axes):</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> i <span class="op">&lt;</span> <span class="bu">len</span>(intermediate_states2):</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>        heatmap <span class="op">=</span> ax.imshow(intermediate_states2[i], cmap<span class="op">=</span><span class="st">'gist_earth'</span>, interpolation<span class="op">=</span><span class="st">'nearest'</span>)</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>        ax.set_title(<span class="ss">f'Iteration </span><span class="sc">{</span>visualization_steps[i]<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    ax.axis(<span class="st">'off'</span>)</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>fig.subplots_adjust(right<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>cbar_ax <span class="op">=</span> fig.add_axes([<span class="fl">0.85</span>, <span class="fl">0.15</span>, <span class="fl">0.05</span>, <span class="fl">0.7</span>])</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>fig.colorbar(heatmap, cax<span class="op">=</span>cbar_ax)</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-17-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-outputid="77b7dcfd-0473-4e9c-93d7-009daa2743bd" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Simulation time: </span><span class="sc">{</span>elapsed_time<span class="sc">}</span><span class="ss"> seconds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simulation time: 0.6280460357666016 seconds</code></pre>
+</div>
+</div>
+<p>Look at that time diffrence!! We thought method two was fast, but this method is even faster! Let’s see if it is even possible to make the computation even faster</p>
+</section>
+</section>
+<section id="section-4-with-jax" class="level1">
+<h1>Section 4: With jax</h1>
+<p>This time we will take the advance_time_numpy function and chnage it so it is a jax compatibal function that uses the jit compliation feature. This should make the computation fast than it was in Part Three. When making the chnages the big diffrence we will make is use jax.numpy instead of numpy. We need to ensur that the code does not rely on in-place modifications due to JAX’s immutability.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> jax.numpy <span class="im">as</span> jnp</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> jax <span class="im">import</span> jit</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="at">@jit</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> advance_time_jax(u, epsilon):</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co">    Advances the heat distribution in a grid by one timestep using JAX for computation.</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="co">    Args:</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="co">        u (jax.numpy.ndarray): The current state of the grid.</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="co">        epsilon (float): The stability constant used to scale the heat diffusion.</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a><span class="co">        jax.numpy.ndarray: The updated state of the grid after one timestep.</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a><span class="co">     """</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># JAX-compatible padding</span></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>    padded_u <span class="op">=</span> jnp.pad(u, <span class="dv">1</span>, mode<span class="op">=</span><span class="st">'constant'</span>, constant_values<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Compute the difference using jnp.roll for simulating heat diffusion</span></span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>    up <span class="op">=</span> jnp.roll(padded_u, <span class="op">-</span><span class="dv">1</span>, axis<span class="op">=</span><span class="dv">0</span>)[<span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>    down <span class="op">=</span> jnp.roll(padded_u, <span class="dv">1</span>, axis<span class="op">=</span><span class="dv">0</span>)[<span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>    left <span class="op">=</span> jnp.roll(padded_u, <span class="op">-</span><span class="dv">1</span>, axis<span class="op">=</span><span class="dv">1</span>)[<span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>    right <span class="op">=</span> jnp.roll(padded_u, <span class="dv">1</span>, axis<span class="op">=</span><span class="dv">1</span>)[<span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Update the grid state</span></span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>    u_next <span class="op">=</span> u <span class="op">+</span> epsilon <span class="op">*</span> (up <span class="op">+</span> down <span class="op">+</span> left <span class="op">+</span> right <span class="op">-</span> <span class="dv">4</span> <span class="op">*</span> u)</span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> u_next</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="step-two-test-jit-compliation" class="level4">
+<h4 class="anchored" data-anchor-id="step-two-test-jit-compliation">Step two: test jit compliation</h4>
+<p>To get the function complied first we will run the the compliation for a short range before iterating it for 27000. This phase ensures that subsequent uses of the function benefit from JIT compilation.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>u_short <span class="op">=</span> jnp.zeros((<span class="dv">5</span>, <span class="dv">5</span>))</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>):  <span class="co"># A small number of iterations</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    u_short <span class="op">=</span> advance_time_jax(u_short, <span class="fl">0.1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="step-three-visualize-the-heat-diffusion" class="level4">
+<h4 class="anchored" data-anchor-id="step-three-visualize-the-heat-diffusion">Step Three: Visualize the Heat Diffusion</h4>
+<p>Now we will run the full simulation for the 2700 iterations and collect the gride state for visualization every 300 iteration. We will again follow similar steps as we did in the previous methods.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize simulation parameters with JAX</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="dv">101</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>epsilon <span class="op">=</span> <span class="fl">0.2</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>iterations <span class="op">=</span> <span class="dv">2700</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>visualization_steps <span class="op">=</span> [i <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">300</span>, <span class="dv">2701</span>, <span class="dv">300</span>)]</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Initial grid state with JAX</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>u_initial <span class="op">=</span> jnp.zeros((N, N))</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>u_initial <span class="op">=</span> u_initial.at[N<span class="op">//</span><span class="dv">2</span>, N<span class="op">//</span><span class="dv">2</span>].<span class="bu">set</span>(<span class="fl">1.0</span>)  <span class="co"># Set hot spot</span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="co"># List for storing states for visualization</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>intermediate_states <span class="op">=</span> []</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Run simulation</span></span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>start_time <span class="op">=</span> time.time()</span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> step <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, iterations <span class="op">+</span> <span class="dv">1</span>):</span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>    u_initial <span class="op">=</span> advance_time_jax(u_initial, epsilon)</span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> step <span class="kw">in</span> visualization_steps:</span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>        intermediate_states.append(u_initial)</span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>elapsed_time <span class="op">=</span> time.time() <span class="op">-</span> start_time</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-outputid="0175017f-9cef-4575-c3dd-df4e19915107" data-execution_count="29">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">3</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">15</span>))</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>axes <span class="op">=</span> axes.flatten()</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, ax <span class="kw">in</span> <span class="bu">enumerate</span>(axes):</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> i <span class="op">&lt;</span> <span class="bu">len</span>(intermediate_states):</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>        heatmap <span class="op">=</span> ax.imshow(intermediate_states[i], cmap<span class="op">=</span><span class="st">'Pastel2'</span>, interpolation<span class="op">=</span><span class="st">'nearest'</span>)</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>        ax.set_title(<span class="ss">f'Iteration </span><span class="sc">{</span>visualization_steps[i]<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>    ax.axis(<span class="st">'off'</span>)</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>fig.subplots_adjust(right<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>cbar_ax <span class="op">=</span> fig.add_axes([<span class="fl">0.85</span>, <span class="fl">0.15</span>, <span class="fl">0.05</span>, <span class="fl">0.7</span>])</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>fig.colorbar(heatmap, cax<span class="op">=</span>cbar_ax)</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-23-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-outputid="6c5f7a0c-bcb4-411f-df97-c3c109bf033d">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Simulation time with JAX (after JIT): </span><span class="sc">{</span>elapsed_time<span class="sc">}</span><span class="ss"> seconds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simulation time with JAX (after JIT): 0.22069501876831055 seconds</code></pre>
+</div>
+</div>
+<p>Look at theses cool colors! We can really get creative with these heatmaps. Also we manged to drop the time even more. We went from aroudn .6 seconds to .2 seconds! That is incredible</p>
+</section>
+<section id="part-five-comparing-the-four-methods" class="level4">
+<h4 class="anchored" data-anchor-id="part-five-comparing-the-four-methods">Part Five : Comparing the Four Methods</h4>
+<p>While all four methods provided us the same results, their time efficiency drastically changed. The main time difference was between the first and second method, yet the third and fourth one still continued to shave off time, allowing us to be able to make the visualization in a mere .22 seconds rather than the original 217 seconds it took the first method.</p>
+<p>While as you went down through the methods, they got faster, they also got a bit more complicated and harder to write. If you are in a time crunch and you are struggling with the computation, I would recommend trying method two or three. Although they are not as fast as method four they are still relatively easy to formulate, and are not as slow as method 1.</p>
+<p>I hope this helped and I wish you the best of luck creating your own heat diffusion maps now!</p>
 
 
 </section>
