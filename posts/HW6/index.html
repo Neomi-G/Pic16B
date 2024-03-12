@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Myblog - HW 6: Fake News Classification</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Myblog</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html" rel="" target="">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/" rel="" target=""><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com" rel="" target=""><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">HW 6: Fake News Classification</h1>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">---</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>title: <span class="st">"HW 6, Fake News Classifications"</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>author: <span class="st">"Neomi Goodman"</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>date: <span class="st">"2024-03-11"</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>categories: [week <span class="dv">9</span>, HW <span class="dv">6</span> ]</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="op">---</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>In this blog we work with Keras to creat a model that can classify fake news. We will aquire data, creat a database, construct the models train them and evalute their accuracy before we also include some visualization. There is so much work to do so lets get started!</p>
+<section id="step-1-acquire-training-data" class="level2">
+<h2 class="anchored" data-anchor-id="step-1-acquire-training-data">Step 1 : Acquire Training Data</h2>
+<p>To start off we will need to get data that contianes both fake and real news so we can train our model with it. For this blog we will use the article by Ahmed H. and Saad s 2017</p>
+<p>(Ahmed H, Traore I, Saad S. (2017) “Detection of Online Fake News Using N-Gram Analysis and Machine Learning Techniques. In: Traore I., Woungang I., Awad A. (eds) Intelligent, Secure, and Dependable Systems in Distributed and Cloud Environments. ISDDC 2017. Lecture Notes in Computer Science, vol 10618. Springer, Cham (pp.&nbsp;127-138).)</p>
+<p>Feel free to using the same database to follow along with the blog post more easily.</p>
+<p>First step is to import any package we might need for the creation of the model</p>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tensorflow <span class="im">as</span> tf</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tensorflow.keras.layers.experimental.preprocessing <span class="im">import</span> TextVectorization</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> string</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Once we imported the pandas package we can creat the train_url variable with the url for our database csv and read the database into python by calling pd.read_csv()</p>
+<div class="cell" data-outputid="c9b8d310-d38d-4c86-fbcf-12ccce37eb61" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>train_url <span class="op">=</span> <span class="st">"https://github.com/PhilChodrow/PIC16b/blob/master/datasets/fake_news_train.csv?raw=true"</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>train_df<span class="op">=</span>pd.read_csv(train_url)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>train_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+
+  <div id="df-9a74f5de-3d74-49a6-b682-ed3762b01c74" class="colab-df-container">
+    <div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Unnamed: 0</th>
+<th data-quarto-table-cell-role="th">title</th>
+<th data-quarto-table-cell-role="th">text</th>
+<th data-quarto-table-cell-role="th">fake</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>17366</td>
+<td>Merkel: Strong result for Austria's FPO 'big c...</td>
+<td>German Chancellor Angela Merkel said on Monday...</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>5634</td>
+<td>Trump says Pence will lead voter fraud panel</td>
+<td>WEST PALM BEACH, Fla.President Donald Trump sa...</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>17487</td>
+<td>JUST IN: SUSPECTED LEAKER and “Close Confidant...</td>
+<td>On December 5, 2017, Circa s Sara Carter warne...</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>12217</td>
+<td>Thyssenkrupp has offered help to Argentina ove...</td>
+<td>Germany s Thyssenkrupp, has offered assistance...</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>5535</td>
+<td>Trump say appeals court decision on travel ban...</td>
+<td>President Donald Trump on Thursday called the ...</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">22444</td>
+<td>10709</td>
+<td>ALARMING: NSA Refuses to Release Clinton-Lynch...</td>
+<td>If Clinton and Lynch just talked about grandki...</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">22445</td>
+<td>8731</td>
+<td>Can Pence's vow not to sling mud survive a Tru...</td>
+<td>() - In 1990, during a close and bitter congre...</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">22446</td>
+<td>4733</td>
+<td>Watch Trump Campaign Try To Spin Their Way Ou...</td>
+<td>A new ad by the Hillary Clinton SuperPac Prior...</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">22447</td>
+<td>3993</td>
+<td>Trump celebrates first 100 days as president, ...</td>
+<td>HARRISBURG, Pa.U.S. President Donald Trump hit...</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">22448</td>
+<td>12896</td>
+<td>TRUMP SUPPORTERS REACT TO DEBATE: “Clinton New...</td>
+<td>MELBOURNE, FL is a town with a population of 7...</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>22449 rows × 4 columns</p>
+</div>
+    <div class="colab-df-buttons">
+
+  <div class="colab-df-container">
+    <button class="colab-df-convert" onclick="convertToInteractive('df-9a74f5de-3d74-49a6-b682-ed3762b01c74')" title="Convert this dataframe to an interactive table." style="display:none;">
+
+  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewbox="0 -960 960 960">
+    <path d="M120-120v-720h720v720H120Zm60-500h600v-160H180v160Zm220 220h160v-160H400v160Zm0 220h160v-160H400v160ZM180-400h160v-160H180v160Zm440 0h160v-160H620v160ZM180-180h160v-160H180v160Zm440 0h160v-160H620v160Z"></path>
+  </svg>
+    </button>
+
+  <style>
+    .colab-df-container {
+      display:flex;
+      gap: 12px;
+    }
+
+    .colab-df-convert {
+      background-color: #E8F0FE;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+      fill: #1967D2;
+      height: 32px;
+      padding: 0 0 0 0;
+      width: 32px;
+    }
+
+    .colab-df-convert:hover {
+      background-color: #E2EBFA;
+      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);
+      fill: #174EA6;
+    }
+
+    .colab-df-buttons div {
+      margin-bottom: 4px;
+    }
+
+    [theme=dark] .colab-df-convert {
+      background-color: #3B4455;
+      fill: #D2E3FC;
+    }
+
+    [theme=dark] .colab-df-convert:hover {
+      background-color: #434B5C;
+      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));
+      fill: #FFFFFF;
+    }
+  </style>
+
+    <script>
+      const buttonEl =
+        document.querySelector('#df-9a74f5de-3d74-49a6-b682-ed3762b01c74 button.colab-df-convert');
+      buttonEl.style.display =
+        google.colab.kernel.accessAllowed ? 'block' : 'none';
+
+      async function convertToInteractive(key) {
+        const element = document.querySelector('#df-9a74f5de-3d74-49a6-b682-ed3762b01c74');
+        const dataTable =
+          await google.colab.kernel.invokeFunction('convertToInteractive',
+                                                    [key], {});
+        if (!dataTable) return;
+
+        const docLinkHtml = 'Like what you see? Visit the ' +
+          '<a target="_blank" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'
+          + ' to learn more about interactive tables.';
+        element.innerHTML = '';
+        dataTable['output_type'] = 'display_data';
+        await google.colab.output.renderOutput(dataTable, element);
+        const docLink = document.createElement('div');
+        docLink.innerHTML = docLinkHtml;
+        element.appendChild(docLink);
+      }
+    </script>
+  </div>
+
+
+<div id="df-37ec7a03-b0bf-490c-9ad9-8e23fb7e3a78">
+  <button class="colab-df-quickchart" onclick="quickchart('df-37ec7a03-b0bf-490c-9ad9-8e23fb7e3a78')" title="Suggest charts" style="display:none;">
+
+<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewbox="0 0 24 24" width="24px">
+    <g>
+        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"></path>
+    </g>
+</svg>
+  </button>
+
+<style>
+  .colab-df-quickchart {
+      --bg-color: #E8F0FE;
+      --fill-color: #1967D2;
+      --hover-bg-color: #E2EBFA;
+      --hover-fill-color: #174EA6;
+      --disabled-fill-color: #AAA;
+      --disabled-bg-color: #DDD;
+  }
+
+  [theme=dark] .colab-df-quickchart {
+      --bg-color: #3B4455;
+      --fill-color: #D2E3FC;
+      --hover-bg-color: #434B5C;
+      --hover-fill-color: #FFFFFF;
+      --disabled-bg-color: #3B4455;
+      --disabled-fill-color: #666;
+  }
+
+  .colab-df-quickchart {
+    background-color: var(--bg-color);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: none;
+    fill: var(--fill-color);
+    height: 32px;
+    padding: 0;
+    width: 32px;
+  }
+
+  .colab-df-quickchart:hover {
+    background-color: var(--hover-bg-color);
+    box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+    fill: var(--button-hover-fill-color);
+  }
+
+  .colab-df-quickchart-complete:disabled,
+  .colab-df-quickchart-complete:disabled:hover {
+    background-color: var(--disabled-bg-color);
+    fill: var(--disabled-fill-color);
+    box-shadow: none;
+  }
+
+  .colab-df-spinner {
+    border: 2px solid var(--fill-color);
+    border-color: transparent;
+    border-bottom-color: var(--fill-color);
+    animation:
+      spin 1s steps(1) infinite;
+  }
+
+  @keyframes spin {
+    0% {
+      border-color: transparent;
+      border-bottom-color: var(--fill-color);
+      border-left-color: var(--fill-color);
+    }
+    20% {
+      border-color: transparent;
+      border-left-color: var(--fill-color);
+      border-top-color: var(--fill-color);
+    }
+    30% {
+      border-color: transparent;
+      border-left-color: var(--fill-color);
+      border-top-color: var(--fill-color);
+      border-right-color: var(--fill-color);
+    }
+    40% {
+      border-color: transparent;
+      border-right-color: var(--fill-color);
+      border-top-color: var(--fill-color);
+    }
+    60% {
+      border-color: transparent;
+      border-right-color: var(--fill-color);
+    }
+    80% {
+      border-color: transparent;
+      border-right-color: var(--fill-color);
+      border-bottom-color: var(--fill-color);
+    }
+    90% {
+      border-color: transparent;
+      border-bottom-color: var(--fill-color);
+    }
+  }
+</style>
+
+  <script>
+    async function quickchart(key) {
+      const quickchartButtonEl =
+        document.querySelector('#' + key + ' button');
+      quickchartButtonEl.disabled = true;  // To prevent multiple clicks.
+      quickchartButtonEl.classList.add('colab-df-spinner');
+      try {
+        const charts = await google.colab.kernel.invokeFunction(
+            'suggestCharts', [key], {});
+      } catch (error) {
+        console.error('Error during call to suggestCharts:', error);
+      }
+      quickchartButtonEl.classList.remove('colab-df-spinner');
+      quickchartButtonEl.classList.add('colab-df-quickchart-complete');
+    }
+    (() => {
+      let quickchartButtonEl =
+        document.querySelector('#df-37ec7a03-b0bf-490c-9ad9-8e23fb7e3a78 button');
+      quickchartButtonEl.style.display =
+        google.colab.kernel.accessAllowed ? 'block' : 'none';
+    })();
+  </script>
+</div>
+
+  <div id="id_d76ba883-7e9e-4091-b4af-1001f93f5ebd">
+    <style>
+      .colab-df-generate {
+        background-color: #E8F0FE;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        display: none;
+        fill: #1967D2;
+        height: 32px;
+        padding: 0 0 0 0;
+        width: 32px;
+      }
+
+      .colab-df-generate:hover {
+        background-color: #E2EBFA;
+        box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);
+        fill: #174EA6;
+      }
+
+      [theme=dark] .colab-df-generate {
+        background-color: #3B4455;
+        fill: #D2E3FC;
+      }
+
+      [theme=dark] .colab-df-generate:hover {
+        background-color: #434B5C;
+        box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+        filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));
+        fill: #FFFFFF;
+      }
+    </style>
+    <button class="colab-df-generate" onclick="generateWithVariable('train_df')" title="Generate code using this dataframe." style="display:none;">
+
+  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewbox="0 0 24 24" width="24px">
+    <path d="M7,19H8.4L18.45,9,17,7.55,7,17.6ZM5,21V16.75L18.45,3.32a2,2,0,0,1,2.83,0l1.4,1.43a1.91,1.91,0,0,1,.58,1.4,1.91,1.91,0,0,1-.58,1.4L9.25,21ZM18.45,9,17,7.55Zm-12,3A5.31,5.31,0,0,0,4.9,8.1,5.31,5.31,0,0,0,1,6.5,5.31,5.31,0,0,0,4.9,4.9,5.31,5.31,0,0,0,6.5,1,5.31,5.31,0,0,0,8.1,4.9,5.31,5.31,0,0,0,12,6.5,5.46,5.46,0,0,0,6.5,12Z"></path>
+  </svg>
+    </button>
+    <script>
+      (() => {
+      const buttonEl =
+        document.querySelector('#id_d76ba883-7e9e-4091-b4af-1001f93f5ebd button.colab-df-generate');
+      buttonEl.style.display =
+        google.colab.kernel.accessAllowed ? 'block' : 'none';
+
+      buttonEl.onclick = () => {
+        google.colab.notebook.generateWithVariable('train_df');
+      }
+      })();
+    </script>
+  </div>
+
+    </div>
+  </div>
+</div>
+</div>
+<p>As you can see we are working with a table that three main columes that we will be working with. The title column includes the title of the article, the text column provides us with the entier artcile text, while the last column, fake, tells us if the artcile has fake news or is real. 0 for true and 1 for fake news.</p>
+<p>Now we can start creating a dataset, lets get started</p>
+</section>
+<section id="step-2-make-a-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="step-2-make-a-dataset">Step 2: Make a Dataset</h2>
+<p>We will creat a function called make_dataset which will do three things</p>
+<p>The function will change all the text to lowercase,remove any stopwords( unimportant or essential words), and lastly construct and retrun a tf.data.Dataset which will have to two inputs and one output. This might seem like a lot but don’t worry we will break it down and go step by step.</p>
+<p>To first start we need to import the nltk package and get the stopwords from the nltk.corpus libary to make the function easier to create. nltk. download, downloads the list of English stopwords (common words that are usually removed in the preprocessing steps of text analysis because they carry less meaningful information for analysis, e.g., “the”, “is”, “in”). Now we are ready to start working on the function.</p>
+<p>The first step is to convert all the article text and title text to lowercase as it would impact the way the words are seen. Mor specifcially, the model views “Hello” and “hello” to be diffrent things which will make us have to work double as much.</p>
+<p>The stopword removal step is integrated directly into the apply method calls for both the ‘text’ and ‘title’ columns. A lambda function is used to iterate over each word in the input text, filter out stopwords, and then join the remaining words back into a single string.</p>
+<p>We then creat a TensorFlow dataset from the preprocessed ‘text’ and ‘title’ columns along with the target ‘fake’ column. This dataset is suitable for feeding into a machine learning model built with TensorFlow. Let’s break down how to do it.</p>
+<p>tf.data.Dataset.from_tensor_slices(…) if a TensorFlow function which creates a Dataset object from tensor slices. It is meant to handel large amounts of data in an efficent manner and allows you to batch and shuffle the data in a very simple manner. “from_tensor_slices” is a tuple with two elements, thje first is the text and title keys- each corresponding to a numpy array from the training_df and conatine all the values from the colum. The second tuple has the keys of wether the text is false or not. Lastly, dataset.batch(100) batchs consective elemnts of the datasets. It is important we batch as it is as it allows for parallel computation over the batch, reducing training time. It also helps with memory management, as it limits the amount of data loaded into memory at once.</p>
+<div class="cell" data-outputid="ce621e01-32cd-48c8-bd9b-0219f2c65821" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> nltk</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> nltk.corpus <span class="im">import</span> stopwords</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>nltk.download(<span class="st">'stopwords'</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>stop_words <span class="op">=</span> <span class="bu">set</span>(stopwords.words(<span class="st">'english'</span>))</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_dataset(df):</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">    Preprocesses the input DataFrame by converting text to lowercase, removing stopwords,</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co">    and constructing a TensorFlow dataset.</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters:</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co">    - train_df: A pandas DataFrame with columns 'text', 'title', and 'fake'.</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co">    - A batched TensorFlow dataset containing preprocessed text and titles as features</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="co">      and 'fake' column values as labels.</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convert text to lowercase</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    train_df[<span class="st">'text'</span>] <span class="op">=</span> train_df[<span class="st">'text'</span>].<span class="bu">str</span>.lower()</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    train_df[<span class="st">'title'</span>] <span class="op">=</span> train_df[<span class="st">'title'</span>].<span class="bu">str</span>.lower()</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Directly remove stopwords from text and title using a lambda function</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    train_df[<span class="st">'text'</span>] <span class="op">=</span> train_df[<span class="st">'text'</span>].<span class="bu">apply</span>(<span class="kw">lambda</span> input_text: <span class="st">" "</span>.join([word <span class="cf">for</span> word <span class="kw">in</span> input_text.split() <span class="cf">if</span> word <span class="kw">not</span> <span class="kw">in</span> stop_words]))</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    train_df[<span class="st">'title'</span>] <span class="op">=</span> train_df[<span class="st">'title'</span>].<span class="bu">apply</span>(<span class="kw">lambda</span> input_text: <span class="st">" "</span>.join([word <span class="cf">for</span> word <span class="kw">in</span> input_text.split() <span class="cf">if</span> word <span class="kw">not</span> <span class="kw">in</span> stop_words]))</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Construct the dataset</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    dataset <span class="op">=</span> tf.data.Dataset.from_tensor_slices((</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>        {<span class="st">"title"</span>: train_df[<span class="st">'title'</span>].values, <span class="st">"text"</span>: train_df[<span class="st">'text'</span>].values},</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>        train_df[<span class="st">'fake'</span>].values</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    ))</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Batch the dataset</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>    dataset <span class="op">=</span> dataset.batch(<span class="dv">100</span>)</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> dataset</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>[nltk_data] Downloading package stopwords to /root/nltk_data...
+[nltk_data]   Unzipping corpora/stopwords.zip.</code></pre>
+</div>
+</div>
+<section id="spliting-data-get-validation-data" class="level4">
+<h4 class="anchored" data-anchor-id="spliting-data-get-validation-data">Spliting data: get validation data</h4>
+<p>Now that we have created our main dataset we can go ahead and split off 20% of our data to use for validation. When creating a model it is important to divided you data, so you cna use some of it to train and some to test. The pourpose of this is so when you finish training you model you can test your model on data that it has not yet been exposed to.</p>
+<p>In the code below I show how to split the dataset. The make_dataset function further processes these subsets by cleaning and organizing the data into a structured format that TensorFlow models can work with directly. This process ensures that the model can be trained effectively and evaluated on unseen data, helping to gauge its performance and generalizeability.</p>
+<p>train_test_split(train_df, test_size=0.2, random_state=42) splits out dataset into two part, one for training and one for validation. test_size=0.2 indicates that 20% of the data will be set for the valdiation and 80% will be used for training.</p>
+<p>make_dataset(train_df) calls the make_dataset function which we created above on the training DataFrame train_df. It preprocesses the text data and constructs a TensorFlow dataset which is batched and returned, ready for model training.</p>
+<p>make_dataset(val_df) Similarly, calls the make_dataset function on the validation DataFrame val_df. It undergoes the same preprocessing and is also returned as a batched TensorFlow dataset, ready for model validation.</p>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Split the dataset for training and validation</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>train_df, val_df <span class="op">=</span> train_test_split(train_df, test_size<span class="op">=</span><span class="fl">0.2</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>train_dataset <span class="op">=</span> make_dataset(train_df)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>val_dataset <span class="op">=</span> make_dataset(val_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="base-rate" class="level4">
+<h4 class="anchored" data-anchor-id="base-rate">Base Rate</h4>
+<p>Next to be able to measure our progress and test the accuracy of the model we need to establish a base accuracy rate. We will determine the vase rate for this data set by examining the labels on the training set. When we run the code we see that our start rate is 52% which is a good start. Now lets</p>
+<div class="cell" data-outputid="0c24cdea-59f5-4aba-853b-76e257b2dfc9" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>base_rate <span class="op">=</span> train_df[<span class="st">'fake'</span>].value_counts(normalize<span class="op">=</span><span class="va">True</span>).<span class="bu">max</span>()</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Base rate: </span><span class="sc">{</span>base_rate<span class="sc">:.2f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Base rate: 0.52</code></pre>
+</div>
+</div>
+</section>
+<section id="textvectorization" class="level4">
+<h4 class="anchored" data-anchor-id="textvectorization">TextVectorization</h4>
+<p>When we creat machine learning models they work with numerical data rather, howvere since our database examines artciles we currently have raw text. Therefore, we need to creat a textvectorization layer to transform the text into a format that our model can use to train on. Let’s breakdown how to creat such a layer.</p>
+<p><strong>1st step:</strong> we need to set a maximum number of words to keep in the vocabulary. For this model we will consider the top 2,000 most frequent words in the dataset which should cover in our instances all if not most words.</p>
+<p><strong>2nd step:</strong> We creat a function that defines a custom standarization to preprocess text data. It converst all the text to lowercase and removes any punctation. It is important we due thois as it helps limit unnecessary variability within our data and makes it easier for our models to learn better.</p>
+<p><strong>3rd step:</strong> We then creat an instance of the TextVectorization layer using the previously defined standardization function. This converts text into numerical data that can be fed into a TensorFlow model. The max_tokens Sets the size of the vocabulary to the value of size_vocabulary and the output_mode=‘int’ has the layer output integer indices representing the words in the vocabulary. Lastly, output_sequence_length=500 ensures that all output sequences have a fixed length of 500 tokens.In the case that the text is shorter zeros will be added to it.</p>
+<p><strong>4th step:</strong>The last step is to fit the layer to the training data using adapt. It learns the vocabulary from the ‘title’ field of the training dataset.</p>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#preparing a text vectorization layer for tf model</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>size_vocabulary <span class="op">=</span> <span class="dv">2000</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> standardization(input_data):</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    lowercase <span class="op">=</span> tf.strings.lower(input_data)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    no_punctuation <span class="op">=</span> tf.strings.regex_replace(lowercase,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>                                  <span class="st">'[</span><span class="sc">%s</span><span class="st">]'</span> <span class="op">%</span> re.escape(string.punctuation),<span class="st">''</span>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> no_punctuation</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>title_vectorize_layer <span class="op">=</span> TextVectorization(</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    standardize<span class="op">=</span>standardization,</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    max_tokens<span class="op">=</span>size_vocabulary, <span class="co"># only consider this many words</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    output_mode<span class="op">=</span><span class="st">'int'</span>,</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    output_sequence_length<span class="op">=</span><span class="dv">500</span>)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>title_vectorize_layer.adapt(train_dataset.<span class="bu">map</span>(<span class="kw">lambda</span> x, y: x[<span class="st">"title"</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can now do the exact same things for the the text</p>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>text_vectorize_layer <span class="op">=</span> TextVectorization(</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    standardize<span class="op">=</span>standardization,</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    max_tokens<span class="op">=</span>size_vocabulary, <span class="co"># only consider this many words</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    output_mode<span class="op">=</span><span class="st">'int'</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    output_sequence_length<span class="op">=</span><span class="dv">500</span>)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>text_vectorize_layer.adapt(train_dataset.<span class="bu">map</span>(<span class="kw">lambda</span> x, y: x[<span class="st">"text"</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="step-3-create-models" class="level2">
+<h2 class="anchored" data-anchor-id="step-3-create-models">Step 3: Create models</h2>
+<p>Next step is to creat a model that will detect if the news are fake or not. We will actually creat three models. One will use only use the artcile title as input, one will only use artical text as input, and the last one will use both article title and text as input. We are creating the three models so we could determine wether it is most effective to look at the title, full text or both when trying to detect fake news.</p>
+<p>We have a lot of wrok ahead of us lets get started!</p>
+<section id="model-1-only-article-title-as-input" class="level4">
+<h4 class="anchored" data-anchor-id="model-1-only-article-title-as-input">Model 1: only article title as input</h4>
+<p>Like before we are going to need to import some more packages that will be used in creating the model. From tensorflow.keras we are importing Model which is used to instantiate a new model, and Input which is used to specify the input layer of the model.Dense and GlobalAveragePooling1D layers are also imported from tensorflow.keras.layers. Dense is a fully connected neural network layer, and GlobalAveragePooling1D is used for pooling operations.</p>
+<p>The first step in creating a the model is creating an embedding layer which is important for processing tect in neural networks. It turns positive integers (indexes) into dense vectors of fixed size (output_dim). The first parameter, input_dim, is the size of the vocabulary (size_vocabulary) plus one, accounting for the zero padding ( as we mentioned before that zeros will be added if its too short). This layer is later applied to the vectorized titles.</p>
+<p>title_input is created to accept a single string every time which denotes the title of the article. We need to include this to specifies the shape and data type of the input the model will recive. We then pass the title_input through the textvectorization layer we created above to convert the strings into the sequences of integeres that our model can process. We then send it through the embedding layer which converst the sequence of integers into a sequence of dense vectors.</p>
+<p>We then creat the GlobalAveragePooling1D layer pools the features by taking the average across the sequence dimension of the embeddings, reducing the output to a fixed-length vector. This condense the information from the entire title into a format suitable for the prediction layer, making it easier to process by the network.</p>
+<p>We then creat the dense layer which ensures the output is between 0 and 1 and can be used for binary classification task.</p>
+<p>We then define the model with the specifc input and output and are ready to compile the model. The model is compiled with the Adam optimizer and binary_crossentropy loss function, which is appropriate for binary classification tasks.</p>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tensorflow.keras <span class="im">import</span> Model, Input</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tensorflow.keras.layers <span class="im">import</span> Dense, GlobalAveragePooling1D</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>embedding_layer <span class="op">=</span> tf.keras.layers.Embedding(input_dim<span class="op">=</span>size_vocabulary <span class="op">+</span> <span class="dv">1</span>, output_dim<span class="op">=</span><span class="dv">32</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Input layer for titles</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>title_input <span class="op">=</span> Input(shape<span class="op">=</span>(<span class="dv">1</span>,), dtype<span class="op">=</span><span class="st">'string'</span>, name<span class="op">=</span><span class="st">'title'</span>)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>title_vectorized <span class="op">=</span> title_vectorize_layer(title_input)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>title_embedded <span class="op">=</span> embedding_layer(title_vectorized)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>title_features <span class="op">=</span> GlobalAveragePooling1D()(title_embedded)</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Prediction layer</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>predictions <span class="op">=</span> Dense(<span class="dv">1</span>, activation<span class="op">=</span><span class="st">'sigmoid'</span>)(title_features)</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the model</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>model_title <span class="op">=</span> Model(inputs<span class="op">=</span>title_input, outputs<span class="op">=</span>predictions)</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>model_title.<span class="bu">compile</span>(optimizer<span class="op">=</span><span class="st">'adam'</span>,</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>                    loss<span class="op">=</span><span class="st">'binary_crossentropy'</span>,</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>                    metrics<span class="op">=</span>[<span class="st">'accuracy'</span>])</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-outputid="bbc59b1b-b85b-4c6a-84d3-eb062d1fa0d7" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit the model</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>model_title.fit(train_dataset, validation_data<span class="op">=</span>val_dataset, epochs<span class="op">=</span><span class="dv">20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Epoch 1/20
+180/180 [==============================] - 3s 13ms/step - loss: 0.6910 - accuracy: 0.5212 - val_loss: 0.6895 - val_accuracy: 0.5222
+Epoch 2/20
+180/180 [==============================] - 2s 12ms/step - loss: 0.6867 - accuracy: 0.5358 - val_loss: 0.6836 - val_accuracy: 0.7778
+Epoch 3/20
+180/180 [==============================] - 3s 15ms/step - loss: 0.6776 - accuracy: 0.6081 - val_loss: 0.6711 - val_accuracy: 0.8611
+Epoch 4/20
+180/180 [==============================] - 3s 15ms/step - loss: 0.6614 - accuracy: 0.7015 - val_loss: 0.6508 - val_accuracy: 0.8598
+Epoch 5/20
+180/180 [==============================] - 2s 12ms/step - loss: 0.6379 - accuracy: 0.7919 - val_loss: 0.6237 - val_accuracy: 0.8624
+Epoch 6/20
+180/180 [==============================] - 3s 16ms/step - loss: 0.6085 - accuracy: 0.8370 - val_loss: 0.5918 - val_accuracy: 0.8659
+Epoch 7/20
+180/180 [==============================] - 3s 15ms/step - loss: 0.5754 - accuracy: 0.8546 - val_loss: 0.5575 - val_accuracy: 0.8700
+Epoch 8/20
+180/180 [==============================] - 2s 12ms/step - loss: 0.5409 - accuracy: 0.8657 - val_loss: 0.5230 - val_accuracy: 0.8738
+Epoch 9/20
+180/180 [==============================] - 3s 17ms/step - loss: 0.5071 - accuracy: 0.8714 - val_loss: 0.4901 - val_accuracy: 0.8766
+Epoch 10/20
+180/180 [==============================] - 2s 12ms/step - loss: 0.4753 - accuracy: 0.8751 - val_loss: 0.4596 - val_accuracy: 0.8799
+Epoch 11/20
+180/180 [==============================] - 2s 12ms/step - loss: 0.4461 - accuracy: 0.8774 - val_loss: 0.4319 - val_accuracy: 0.8830
+Epoch 12/20
+180/180 [==============================] - 2s 12ms/step - loss: 0.4198 - accuracy: 0.8812 - val_loss: 0.4070 - val_accuracy: 0.8852
+Epoch 13/20
+180/180 [==============================] - 3s 16ms/step - loss: 0.3963 - accuracy: 0.8841 - val_loss: 0.3848 - val_accuracy: 0.8877
+Epoch 14/20
+180/180 [==============================] - 3s 16ms/step - loss: 0.3752 - accuracy: 0.8873 - val_loss: 0.3648 - val_accuracy: 0.8909
+Epoch 15/20
+180/180 [==============================] - 2s 11ms/step - loss: 0.3562 - accuracy: 0.8917 - val_loss: 0.3468 - val_accuracy: 0.8951
+Epoch 16/20
+180/180 [==============================] - 2s 12ms/step - loss: 0.3390 - accuracy: 0.8953 - val_loss: 0.3305 - val_accuracy: 0.8988
+Epoch 17/20
+180/180 [==============================] - 2s 12ms/step - loss: 0.3234 - accuracy: 0.8994 - val_loss: 0.3156 - val_accuracy: 0.9018
+Epoch 18/20
+180/180 [==============================] - 4s 19ms/step - loss: 0.3092 - accuracy: 0.9033 - val_loss: 0.3019 - val_accuracy: 0.9045
+Epoch 19/20
+180/180 [==============================] - 3s 14ms/step - loss: 0.2961 - accuracy: 0.9062 - val_loss: 0.2894 - val_accuracy: 0.9088
+Epoch 20/20
+180/180 [==============================] - 3s 15ms/step - loss: 0.2841 - accuracy: 0.9091 - val_loss: 0.2778 - val_accuracy: 0.9112</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/usr/local/lib/python3.10/dist-packages/keras/src/engine/functional.py:642: UserWarning: Input dict contained keys ['text'] which did not match any model input. They will be ignored by the model.
+  inputs = self._flatten_to_reference_inputs(inputs)</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<pre><code>&lt;keras.src.callbacks.History at 0x7f0d875bfb80&gt;</code></pre>
+</div>
+</div>
+<p>The validation accuracy predictions look pretty good !! The went from 50% all the way up to 90% With the majority of the rounds being in the mid to high 80% !! So far using the title for accuracy seems like a very good option and helps us creat a strong model</p>
+<div class="cell" data-outputid="e5df3c86-7f9d-43a1-8c66-87afe3301f8f" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> keras <span class="im">import</span> utils</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>utils.plot_model(model_title,</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                       show_shapes<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>                       show_layer_names<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<p><img src="index_files/figure-html/cell-12-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="model-2-only-article-text-an-input" class="level4">
+<h4 class="anchored" data-anchor-id="model-2-only-article-text-an-input">Model 2: only article text an input</h4>
+<p>For the second model we will follow the same tasks as the first model but simply shift from the title to text.</p>
+<div class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>embedding_layer <span class="op">=</span> tf.keras.layers.Embedding(input_dim<span class="op">=</span>size_vocabulary <span class="op">+</span> <span class="dv">1</span>, output_dim<span class="op">=</span><span class="dv">32</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Input layer for titles</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>text_input <span class="op">=</span> Input(shape<span class="op">=</span>(<span class="dv">1</span>,), dtype<span class="op">=</span><span class="st">'string'</span>, name<span class="op">=</span><span class="st">'text'</span>)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>text_vectorize <span class="op">=</span> text_vectorize_layer(text_input)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>text_embedded <span class="op">=</span> embedding_layer(text_vectorize)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>text_features <span class="op">=</span> GlobalAveragePooling1D()(text_embedded)</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Prediction layer</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>predictions <span class="op">=</span> Dense(<span class="dv">1</span>, activation<span class="op">=</span><span class="st">'sigmoid'</span>)(text_features)</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the model</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>model_text <span class="op">=</span> Model(inputs<span class="op">=</span>text_input, outputs<span class="op">=</span>predictions)</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>model_text.<span class="bu">compile</span>(optimizer<span class="op">=</span><span class="st">'adam'</span>,</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>                    loss<span class="op">=</span><span class="st">'binary_crossentropy'</span>,</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>                    metrics<span class="op">=</span>[<span class="st">'accuracy'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-outputid="462d6702-3d89-4419-a9b6-b1bfe0dff486" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit the model</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>model_text.fit(train_dataset, validation_data<span class="op">=</span>val_dataset, epochs<span class="op">=</span><span class="dv">20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Epoch 1/20
+180/180 [==============================] - 7s 29ms/step - loss: 0.6661 - accuracy: 0.5939 - val_loss: 0.6237 - val_accuracy: 0.8799
+Epoch 2/20
+180/180 [==============================] - 6s 32ms/step - loss: 0.5584 - accuracy: 0.8868 - val_loss: 0.4901 - val_accuracy: 0.9186
+Epoch 3/20
+180/180 [==============================] - 5s 30ms/step - loss: 0.4326 - accuracy: 0.9269 - val_loss: 0.3814 - val_accuracy: 0.9399
+Epoch 4/20
+180/180 [==============================] - 6s 31ms/step - loss: 0.3443 - accuracy: 0.9372 - val_loss: 0.3114 - val_accuracy: 0.9471
+Epoch 5/20
+180/180 [==============================] - 6s 35ms/step - loss: 0.2873 - accuracy: 0.9458 - val_loss: 0.2650 - val_accuracy: 0.9530
+Epoch 6/20
+180/180 [==============================] - 4s 25ms/step - loss: 0.2483 - accuracy: 0.9528 - val_loss: 0.2320 - val_accuracy: 0.9569
+Epoch 7/20
+180/180 [==============================] - 6s 31ms/step - loss: 0.2198 - accuracy: 0.9575 - val_loss: 0.2072 - val_accuracy: 0.9611
+Epoch 8/20
+180/180 [==============================] - 5s 30ms/step - loss: 0.1978 - accuracy: 0.9618 - val_loss: 0.1877 - val_accuracy: 0.9644
+Epoch 9/20
+180/180 [==============================] - 4s 24ms/step - loss: 0.1803 - accuracy: 0.9650 - val_loss: 0.1719 - val_accuracy: 0.9679
+Epoch 10/20
+180/180 [==============================] - 6s 35ms/step - loss: 0.1659 - accuracy: 0.9682 - val_loss: 0.1587 - val_accuracy: 0.9704
+Epoch 11/20
+180/180 [==============================] - 5s 27ms/step - loss: 0.1538 - accuracy: 0.9707 - val_loss: 0.1476 - val_accuracy: 0.9720
+Epoch 12/20
+180/180 [==============================] - 5s 30ms/step - loss: 0.1435 - accuracy: 0.9726 - val_loss: 0.1380 - val_accuracy: 0.9730
+Epoch 13/20
+180/180 [==============================] - 5s 29ms/step - loss: 0.1346 - accuracy: 0.9739 - val_loss: 0.1296 - val_accuracy: 0.9742
+Epoch 14/20
+180/180 [==============================] - 5s 29ms/step - loss: 0.1267 - accuracy: 0.9744 - val_loss: 0.1223 - val_accuracy: 0.9753
+Epoch 15/20
+180/180 [==============================] - 5s 29ms/step - loss: 0.1198 - accuracy: 0.9756 - val_loss: 0.1157 - val_accuracy: 0.9761
+Epoch 16/20
+180/180 [==============================] - 5s 29ms/step - loss: 0.1136 - accuracy: 0.9766 - val_loss: 0.1098 - val_accuracy: 0.9774
+Epoch 17/20
+180/180 [==============================] - 6s 33ms/step - loss: 0.1079 - accuracy: 0.9776 - val_loss: 0.1044 - val_accuracy: 0.9784
+Epoch 18/20
+180/180 [==============================] - 4s 24ms/step - loss: 0.1028 - accuracy: 0.9783 - val_loss: 0.0996 - val_accuracy: 0.9796
+Epoch 19/20
+180/180 [==============================] - 5s 29ms/step - loss: 0.0982 - accuracy: 0.9793 - val_loss: 0.0951 - val_accuracy: 0.9800
+Epoch 20/20
+180/180 [==============================] - 5s 29ms/step - loss: 0.0939 - accuracy: 0.9803 - val_loss: 0.0910 - val_accuracy: 0.9811</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/usr/local/lib/python3.10/dist-packages/keras/src/engine/functional.py:642: UserWarning: Input dict contained keys ['title'] which did not match any model input. They will be ignored by the model.
+  inputs = self._flatten_to_reference_inputs(inputs)</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<pre><code>&lt;keras.src.callbacks.History at 0x7f0d89c03640&gt;</code></pre>
+</div>
+</div>
+<p>Look at that validation accuracy predictions !! I thought the ones before were good, but these atre even high with almost all the validation accuracy being in the high 90%. This makes it look like using the text to train and creat the model is far more efficent and accurat than using the title</p>
+<div class="cell" data-outputid="9015a35a-ff24-4373-95d3-cd101abcf48a" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> keras <span class="im">import</span> utils</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>utils.plot_model(model_title, <span class="st">"output_filename.png"</span>,</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>                       show_shapes<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>                       show_layer_names<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="15">
+<p><img src="index_files/figure-html/cell-15-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="model-3-both-the-article-title-and-article-text-as-inputs" class="level4">
+<h4 class="anchored" data-anchor-id="model-3-both-the-article-title-and-article-text-as-inputs">Model 3: both the article title and article text as inputs</h4>
+<p>For the last model we combine and account for both trhe text and the title when trying to determine if the information is true or false. We follow similar direction as model 1 and 2 yet this time we use concatenate to get both the title_feature and the text_feature.</p>
+<div class="cell" data-outputid="5cd9c4aa-383c-448b-d21f-906952136846" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine title and text features</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>combined_features <span class="op">=</span> tf.keras.layers.concatenate([title_features, text_features])</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Prediction layer</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>predictions <span class="op">=</span> Dense(<span class="dv">1</span>, activation<span class="op">=</span><span class="st">'sigmoid'</span>)(combined_features)</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the model</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>model_combined <span class="op">=</span> Model(inputs<span class="op">=</span>[title_input, text_input], outputs<span class="op">=</span>predictions)</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>model_combined.<span class="bu">compile</span>(optimizer<span class="op">=</span><span class="st">'adam'</span>,</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>                       loss<span class="op">=</span><span class="st">'binary_crossentropy'</span>,</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>                       metrics<span class="op">=</span>[<span class="st">'accuracy'</span>])</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>model_combined.fit(train_dataset, validation_data<span class="op">=</span>val_dataset, epochs<span class="op">=</span><span class="dv">20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Epoch 1/20
+180/180 [==============================] - 10s 48ms/step - loss: 0.6250 - accuracy: 0.7136 - val_loss: 0.5157 - val_accuracy: 0.9821
+Epoch 2/20
+180/180 [==============================] - 6s 34ms/step - loss: 0.4371 - accuracy: 0.9798 - val_loss: 0.3690 - val_accuracy: 0.9817
+Epoch 3/20
+180/180 [==============================] - 6s 33ms/step - loss: 0.3197 - accuracy: 0.9803 - val_loss: 0.2773 - val_accuracy: 0.9806
+Epoch 4/20
+180/180 [==============================] - 5s 29ms/step - loss: 0.2468 - accuracy: 0.9794 - val_loss: 0.2199 - val_accuracy: 0.9800
+Epoch 5/20
+180/180 [==============================] - 5s 29ms/step - loss: 0.2002 - accuracy: 0.9798 - val_loss: 0.1822 - val_accuracy: 0.9801
+Epoch 6/20
+180/180 [==============================] - 6s 35ms/step - loss: 0.1687 - accuracy: 0.9801 - val_loss: 0.1559 - val_accuracy: 0.9806
+Epoch 7/20
+180/180 [==============================] - 8s 43ms/step - loss: 0.1461 - accuracy: 0.9809 - val_loss: 0.1365 - val_accuracy: 0.9815
+Epoch 8/20
+180/180 [==============================] - 6s 31ms/step - loss: 0.1291 - accuracy: 0.9817 - val_loss: 0.1215 - val_accuracy: 0.9821
+Epoch 9/20
+180/180 [==============================] - 6s 31ms/step - loss: 0.1158 - accuracy: 0.9825 - val_loss: 0.1096 - val_accuracy: 0.9831
+Epoch 10/20
+180/180 [==============================] - 7s 40ms/step - loss: 0.1050 - accuracy: 0.9832 - val_loss: 0.0998 - val_accuracy: 0.9839
+Epoch 11/20
+180/180 [==============================] - 6s 36ms/step - loss: 0.0961 - accuracy: 0.9840 - val_loss: 0.0916 - val_accuracy: 0.9847
+Epoch 12/20
+180/180 [==============================] - 7s 41ms/step - loss: 0.0885 - accuracy: 0.9847 - val_loss: 0.0846 - val_accuracy: 0.9852
+Epoch 13/20
+180/180 [==============================] - 8s 46ms/step - loss: 0.0819 - accuracy: 0.9852 - val_loss: 0.0784 - val_accuracy: 0.9858
+Epoch 14/20
+180/180 [==============================] - 12s 65ms/step - loss: 0.0762 - accuracy: 0.9856 - val_loss: 0.0731 - val_accuracy: 0.9865
+Epoch 15/20
+180/180 [==============================] - 6s 34ms/step - loss: 0.0711 - accuracy: 0.9865 - val_loss: 0.0683 - val_accuracy: 0.9874
+Epoch 16/20
+180/180 [==============================] - 10s 56ms/step - loss: 0.0666 - accuracy: 0.9874 - val_loss: 0.0640 - val_accuracy: 0.9879
+Epoch 17/20
+180/180 [==============================] - 10s 54ms/step - loss: 0.0625 - accuracy: 0.9879 - val_loss: 0.0602 - val_accuracy: 0.9883
+Epoch 18/20
+180/180 [==============================] - 6s 33ms/step - loss: 0.0589 - accuracy: 0.9884 - val_loss: 0.0567 - val_accuracy: 0.9888
+Epoch 19/20
+180/180 [==============================] - 7s 42ms/step - loss: 0.0555 - accuracy: 0.9888 - val_loss: 0.0534 - val_accuracy: 0.9890
+Epoch 20/20
+180/180 [==============================] - 7s 36ms/step - loss: 0.0524 - accuracy: 0.9894 - val_loss: 0.0505 - val_accuracy: 0.9899</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<pre><code>&lt;keras.src.callbacks.History at 0x7f0d897aff70&gt;</code></pre>
+</div>
+</div>
+<p>The validation accuracy is alsmot 2% higher than the validation accuracy of the modle that only used text to train. This proves that using both text and title of artcle helps creat the most accurate model. Just to comap</p>
+</section>
+<section id="model-evaluation" class="level3">
+<h3 class="anchored" data-anchor-id="model-evaluation">Model Evaluation</h3>
+<p>Now that we have tested the three modles we are ready to use the most efficent model, model three, and run it with our testing data. We will do this by importing the test data and follow the same step as we did with teh training datat. We will use read_csv to read and download the data and creat a teast_df database. We would then apply the make_dataset function to the new dataset and textvectornized it to make sure that it can go through our model. Omce that is done we send it through oiur third model as it proved to be the most effictive with the highest sucesses rate.</p>
+<div class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>test_url <span class="op">=</span> <span class="st">"https://github.com/PhilChodrow/PIC16b/blob/master/datasets/fake_news_test.csv?raw=true"</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>test_df<span class="op">=</span>pd.read_csv(train_url)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>test2_dataset <span class="op">=</span> make_dataset(test_df)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>test1_vectorize_layer <span class="op">=</span> TextVectorization(</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>    standardize<span class="op">=</span>standardization,</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    max_tokens<span class="op">=</span>size_vocabulary, <span class="co"># only consider this many words</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    output_mode<span class="op">=</span><span class="st">'int'</span>,</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>    output_sequence_length<span class="op">=</span><span class="dv">500</span>)</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>test1_vectorize_layer.adapt(test2_dataset.<span class="bu">map</span>(<span class="kw">lambda</span> x, y: x[<span class="st">"title"</span>]))</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>test2_vectorize_layer <span class="op">=</span> TextVectorization(</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>    standardize<span class="op">=</span>standardization,</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>    max_tokens<span class="op">=</span>size_vocabulary, <span class="co"># only consider this many words</span></span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>    output_mode<span class="op">=</span><span class="st">'int'</span>,</span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>    output_sequence_length<span class="op">=</span><span class="dv">500</span>)</span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>test2_vectorize_layer.adapt(test2_dataset.<span class="bu">map</span>(<span class="kw">lambda</span> x, y: x[<span class="st">"text"</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-outputid="9579d267-9520-4c2b-bcb1-d208007de915" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine title and text features</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>combined_features <span class="op">=</span> tf.keras.layers.concatenate([title_features, text_features])</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Prediction layer</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>predictions <span class="op">=</span> Dense(<span class="dv">1</span>, activation<span class="op">=</span><span class="st">'sigmoid'</span>)(combined_features)</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the model</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>model_combined <span class="op">=</span> Model(inputs<span class="op">=</span>[title_input, text_input], outputs<span class="op">=</span>predictions)</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>model_combined.<span class="bu">compile</span>(optimizer<span class="op">=</span><span class="st">'adam'</span>,</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>                       loss<span class="op">=</span><span class="st">'binary_crossentropy'</span>,</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>                       metrics<span class="op">=</span>[<span class="st">'accuracy'</span>])</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>model_combined.fit(test2_dataset, validation_data<span class="op">=</span>val_dataset, epochs<span class="op">=</span><span class="dv">20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Epoch 1/20
+180/180 [==============================] - 7s 34ms/step - loss: 0.4910 - accuracy: 0.9796 - val_loss: 0.3699 - val_accuracy: 0.9939
+Epoch 2/20
+180/180 [==============================] - 6s 35ms/step - loss: 0.3005 - accuracy: 0.9933 - val_loss: 0.2453 - val_accuracy: 0.9931
+Epoch 3/20
+180/180 [==============================] - 6s 31ms/step - loss: 0.2100 - accuracy: 0.9923 - val_loss: 0.1805 - val_accuracy: 0.9923
+Epoch 4/20
+180/180 [==============================] - 6s 33ms/step - loss: 0.1601 - accuracy: 0.9917 - val_loss: 0.1421 - val_accuracy: 0.9917
+Epoch 5/20
+180/180 [==============================] - 7s 39ms/step - loss: 0.1291 - accuracy: 0.9915 - val_loss: 0.1172 - val_accuracy: 0.9916
+Epoch 6/20
+180/180 [==============================] - 6s 34ms/step - loss: 0.1083 - accuracy: 0.9914 - val_loss: 0.0998 - val_accuracy: 0.9917
+Epoch 7/20
+180/180 [==============================] - 6s 34ms/step - loss: 0.0934 - accuracy: 0.9915 - val_loss: 0.0870 - val_accuracy: 0.9919
+Epoch 8/20
+180/180 [==============================] - 6s 34ms/step - loss: 0.0822 - accuracy: 0.9916 - val_loss: 0.0771 - val_accuracy: 0.9919
+Epoch 9/20
+180/180 [==============================] - 6s 36ms/step - loss: 0.0733 - accuracy: 0.9918 - val_loss: 0.0693 - val_accuracy: 0.9921
+Epoch 10/20
+180/180 [==============================] - 5s 30ms/step - loss: 0.0662 - accuracy: 0.9921 - val_loss: 0.0628 - val_accuracy: 0.9925
+Epoch 11/20
+180/180 [==============================] - 7s 38ms/step - loss: 0.0603 - accuracy: 0.9923 - val_loss: 0.0574 - val_accuracy: 0.9926
+Epoch 12/20
+180/180 [==============================] - 7s 40ms/step - loss: 0.0554 - accuracy: 0.9924 - val_loss: 0.0529 - val_accuracy: 0.9928
+Epoch 13/20
+180/180 [==============================] - 6s 33ms/step - loss: 0.0511 - accuracy: 0.9929 - val_loss: 0.0489 - val_accuracy: 0.9931
+Epoch 14/20
+180/180 [==============================] - 6s 36ms/step - loss: 0.0474 - accuracy: 0.9930 - val_loss: 0.0454 - val_accuracy: 0.9935
+Epoch 15/20
+180/180 [==============================] - 6s 35ms/step - loss: 0.0442 - accuracy: 0.9933 - val_loss: 0.0424 - val_accuracy: 0.9938
+Epoch 16/20
+180/180 [==============================] - 5s 30ms/step - loss: 0.0413 - accuracy: 0.9936 - val_loss: 0.0396 - val_accuracy: 0.9942
+Epoch 17/20
+180/180 [==============================] - 6s 33ms/step - loss: 0.0387 - accuracy: 0.9938 - val_loss: 0.0372 - val_accuracy: 0.9944
+Epoch 18/20
+180/180 [==============================] - 9s 51ms/step - loss: 0.0363 - accuracy: 0.9941 - val_loss: 0.0349 - val_accuracy: 0.9946
+Epoch 19/20
+180/180 [==============================] - 7s 40ms/step - loss: 0.0342 - accuracy: 0.9944 - val_loss: 0.0329 - val_accuracy: 0.9948
+Epoch 20/20
+180/180 [==============================] - 6s 34ms/step - loss: 0.0322 - accuracy: 0.9947 - val_loss: 0.0311 - val_accuracy: 0.9949</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="20">
+<pre><code>&lt;keras.src.callbacks.History at 0x7f0d86020130&gt;</code></pre>
+</div>
+</div>
+<p>As we can see we git a really high accuracy of up to 99%. It seems like if we used this model to detect if a new artcile contained fake or true information we would probably be able to get right up to 99% of the time which means our model is really good.</p>
+</section>
+<section id="embedding-visualization" class="level3">
+<h3 class="anchored" data-anchor-id="embedding-visualization">Embedding Visualization</h3>
+<p>Now that we have run the model with our test data we can also make a visualization to get a better undertsnding of our model and the data that we use. We will use the embedding _layer we created earlier for this visualization.</p>
+<div class="cell" data-outputid="2505cbf1-6b9c-4185-fa78-28c8aa040168" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>embedding_matrix <span class="op">=</span> embedding_layer.get_weights()[<span class="dv">0</span>]</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(embedding_matrix.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(2001, 32)</code></pre>
+</div>
+</div>
+<p>We need to perefeom dimensionality reduction on an embeddings matrix using Principal Component Analysis (PCA), which is a technique from linear algebra used for the simplification of data while retaining most of the original variance.</p>
+<p>To do this we need toi import teh needed packages and then creat an instances of PCA class with n_components 2 to specify that the embedded metrix should be reduced to 2. We then first fits the PCA model to the data in embedding_matrix, then transforms the data into the reduced space defined by the first two principal components. The embedding_matrix is expected to be a 2D numpy array where each row represents an embedding vector (for example, a word vector in the context of NLP tasks).</p>
+<div class="cell" data-outputid="1db40e54-2229-4820-a7fe-6245ca6d61fc" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.decomposition <span class="im">import</span> PCA</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Reduce the embeddings to 2 dimensions</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>pca <span class="op">=</span> PCA(n_components<span class="op">=</span><span class="dv">2</span>)  <span class="co"># Use n_components=3 for 3D visualization</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>reduced_embeddings <span class="op">=</span> pca.fit_transform(embedding_matrix)</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(reduced_embeddings.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(2001, 2)</code></pre>
+</div>
+</div>
+<p>To visualize we start by reatriving the vocabulary from a ‘TextVectorization’ layer and creat a dictironaru mapping words to their indicies. We do thuis to locate the words within the emmbedding metrix. We chose to visualize the top 5 most frequent words. The norms (magnitudes) of each word’s embedding vector are computed. The indices of the words with the highest norms are identified, suggesting these words have the most “weight” or significance in the embedding space.The embedding vectors are clustered using the KMeans algorithm, with a specified number of clusters, and for each cluster, a representative word is chosen based on its proximity to the cluster center. We then creat a matplotlib figure to set up teh speace for the word embedding</p>
+<div class="cell" data-outputid="c9c4f485-73dc-4762-b326-b5ccbf0e6bfa" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>vocab <span class="op">=</span> text_vectorize_layer.get_vocabulary()</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>word_to_index <span class="op">=</span> {word: idx <span class="cf">for</span> idx, word <span class="kw">in</span> <span class="bu">enumerate</span>(vocab)}</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>word_indices <span class="op">=</span>[word_to_index[word] <span class="cf">for</span> word <span class="kw">in</span> words_to_visualize <span class="cf">if</span> word <span class="kw">in</span> word_to_index]</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>vocab_size <span class="op">=</span> <span class="bu">len</span>(vocab)</span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>num_words_to_visualize <span class="op">=</span> <span class="dv">5</span></span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>word_frequencies <span class="op">=</span> {word: np.random.randint(<span class="dv">1</span>, <span class="dv">100</span>) <span class="cf">for</span> word <span class="kw">in</span> word_to_index}</span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Sort words by their frequency</span></span>
+<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a>sorted_words <span class="op">=</span> <span class="bu">sorted</span>(word_frequencies, key<span class="op">=</span>word_frequencies.get, reverse<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Select the top N frequent words</span></span>
+<span id="cb35-20"><a href="#cb35-20" aria-hidden="true" tabindex="-1"></a>words_to_visualize <span class="op">=</span> sorted_words[:num_words_to_visualize]</span>
+<span id="cb35-21"><a href="#cb35-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-22"><a href="#cb35-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-23"><a href="#cb35-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate norms of each word's embedding</span></span>
+<span id="cb35-24"><a href="#cb35-24" aria-hidden="true" tabindex="-1"></a>norms <span class="op">=</span> np.linalg.norm(embedding_matrix, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb35-25"><a href="#cb35-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-26"><a href="#cb35-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Find indices of words with the highest norms</span></span>
+<span id="cb35-27"><a href="#cb35-27" aria-hidden="true" tabindex="-1"></a>indices_high_norms <span class="op">=</span> np.argsort(norms)[<span class="op">-</span>num_words_to_visualize:]</span>
+<span id="cb35-28"><a href="#cb35-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-29"><a href="#cb35-29" aria-hidden="true" tabindex="-1"></a>words_to_visualize <span class="op">=</span> [vocab[i] <span class="cf">for</span> i <span class="kw">in</span> indices_high_norms]</span>
+<span id="cb35-30"><a href="#cb35-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-31"><a href="#cb35-31" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> KMeans</span>
+<span id="cb35-32"><a href="#cb35-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-33"><a href="#cb35-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Cluster embeddings</span></span>
+<span id="cb35-34"><a href="#cb35-34" aria-hidden="true" tabindex="-1"></a>num_clusters <span class="op">=</span> <span class="dv">10</span></span>
+<span id="cb35-35"><a href="#cb35-35" aria-hidden="true" tabindex="-1"></a>kmeans <span class="op">=</span> KMeans(n_clusters<span class="op">=</span>num_clusters, random_state<span class="op">=</span><span class="dv">0</span>).fit(embedding_matrix)</span>
+<span id="cb35-36"><a href="#cb35-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-37"><a href="#cb35-37" aria-hidden="true" tabindex="-1"></a><span class="co"># For each cluster, pick one word near the center</span></span>
+<span id="cb35-38"><a href="#cb35-38" aria-hidden="true" tabindex="-1"></a>words_to_visualize <span class="op">=</span> []</span>
+<span id="cb35-39"><a href="#cb35-39" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> cluster_id <span class="kw">in</span> <span class="bu">range</span>(num_clusters):</span>
+<span id="cb35-40"><a href="#cb35-40" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Find indices of words in this cluster</span></span>
+<span id="cb35-41"><a href="#cb35-41" aria-hidden="true" tabindex="-1"></a>    indices_in_cluster <span class="op">=</span> np.where(kmeans.labels_ <span class="op">==</span> cluster_id)[<span class="dv">0</span>]</span>
+<span id="cb35-42"><a href="#cb35-42" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Pick one randomly or the one closest to the cluster center</span></span>
+<span id="cb35-43"><a href="#cb35-43" aria-hidden="true" tabindex="-1"></a>    representative_idx <span class="op">=</span> indices_in_cluster[np.argmin(np.linalg.norm(embedding_matrix[indices_in_cluster] <span class="op">-</span> kmeans.cluster_centers_[cluster_id], axis<span class="op">=</span><span class="dv">1</span>))]</span>
+<span id="cb35-44"><a href="#cb35-44" aria-hidden="true" tabindex="-1"></a>    words_to_visualize.append(vocab[representative_idx])</span>
+<span id="cb35-45"><a href="#cb35-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-46"><a href="#cb35-46" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot</span></span>
+<span id="cb35-47"><a href="#cb35-47" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">8</span>))</span>
+<span id="cb35-48"><a href="#cb35-48" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> word, index <span class="kw">in</span> <span class="bu">zip</span>(words_to_visualize, word_indices):</span>
+<span id="cb35-49"><a href="#cb35-49" aria-hidden="true" tabindex="-1"></a>    plt.scatter(reduced_embeddings[index, <span class="dv">0</span>], reduced_embeddings[index, <span class="dv">1</span>], label<span class="op">=</span>word)</span>
+<span id="cb35-50"><a href="#cb35-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-51"><a href="#cb35-51" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb35-52"><a href="#cb35-52" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'x0'</span>)</span>
+<span id="cb35-53"><a href="#cb35-53" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'x1'</span>)</span>
+<span id="cb35-54"><a href="#cb35-54" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Word Embeddings Visualization'</span>)</span>
+<span id="cb35-55"><a href="#cb35-55" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/usr/local/lib/python3.10/dist-packages/sklearn/cluster/_kmeans.py:870: FutureWarning: The default value of `n_init` will change from 10 to 'auto' in 1.4. Set the value of `n_init` explicitly to suppress the warning
+  warnings.warn(</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-22-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+<p>The graph abopve shows the top five words that were used the most fequentlty! And this is it. It was long but overall not to bad you are now ready to go ahead and do this on your own with your dataset, good luck !</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
